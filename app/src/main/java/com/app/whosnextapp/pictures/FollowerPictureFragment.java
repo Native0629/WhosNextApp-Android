@@ -1,0 +1,233 @@
+package com.app.whosnextapp.pictures;
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.fragment.app.Fragment;
+
+import com.app.whosnextapp.BuildConstants;
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.APIService;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.ProgressRequestBody;
+import com.app.whosnextapp.apis.RetrofitClient;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.model.TagListModel;
+import com.app.whosnextapp.model.UploadPictureModel;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.app.whosnextapp.utility.Utility;
+import com.bumptech.glide.Glide;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.app.Activity.RESULT_OK;
+
+public class FollowerPictureFragment extends Fragment implements ProgressRequestBody.UploadCallbacks {
+
+    @BindView(R.id.iv_picture_thumbnail)
+    AppCompatImageView iv_picture_thumbnail;
+    @BindView(R.id.tv_write_caption)
+    AppCompatTextView tv_write_caption;
+    @BindView(R.id.tv_tag_people)
+    TextView tv_tag_people;
+    @BindView(R.id.ll_upload_progress)
+    LinearLayout ll_upload_progress;
+    @BindView(R.id.progress_uploading)
+    ProgressBar progress_uploading;
+
+    ArrayList<TagListModel> tagListModels = new ArrayList<>();
+    String camera_picture, tag_list, caption;
+    ShareToPictureActivity mContext;
+    Globals globals;
+
+    public static FollowerPictureFragment newInstance() {
+        return new FollowerPictureFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = (ShareToPictureActivity) context;
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_follower_picture, container, false);
+        ButterKnife.bind(this, v);
+        init();
+        return v;
+    }
+
+    private void init() {
+        globals = (Globals) mContext.getApplicationContext();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        progress_uploading.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+        ll_upload_progress.setVisibility(View.GONE);
+
+        if (mContext.getIntent() != null) {
+            camera_picture = mContext.getIntent().getStringExtra(Constants.WN_PICTURE_PATH);
+            if (camera_picture != null) {
+                Glide.with(mContext).load(camera_picture).into(iv_picture_thumbnail);
+            }
+        }
+    }
+
+    @OnClick(R.id.btn_share)
+    public void onShareClick() {
+        if (ll_upload_progress.getVisibility() != View.VISIBLE) {
+            doRequestForUploadPost();
+        }
+    }
+
+    @OnClick(R.id.tv_tag_people)
+    public void onTagPeopleClick() {
+        Intent i = new Intent(getContext(), TagPeopleActivity.class);
+        i.putExtra(Constants.WN_PICTURE_PATH, camera_picture);
+        i.putExtra(Constants.WN_POST_TAG_LIST, tagListModels);
+        startActivityForResult(i, Constants.WN_UPLOAD_PICTURE);
+    }
+
+    @OnClick(R.id.tv_write_caption)
+    public void onCaptionClick() {
+        Intent i = new Intent(getContext(), CaptionActivity.class);
+        i.putExtra(Constants.WN_SHARED_VIDEO_CAPTION, caption);
+        startActivityForResult(i, Constants.WN_CAPTION);
+    }
+
+    private void doRequestForUploadPost() {
+        int imgHeight = iv_picture_thumbnail.getHeight();
+        int imgWidth = iv_picture_thumbnail.getWidth();
+
+        ll_upload_progress.setVisibility(View.VISIBLE);
+        APIService mApiService = RetrofitClient.getClient(BuildConstants.BASE_URL).create(APIService.class);
+
+        File selected_image = new File(camera_picture);
+
+        JSONObject postData = HttpRequestHandler.getInstance().getUploadPictureJson(caption,
+                0, 1, 0, "", "", 0, 0,
+                globals.getUserDetails().getStatus().getCustomerId(), imgWidth, Utility.getHeight(imgHeight, imgWidth, getActivity()), tagListModels);
+
+        ProgressRequestBody fileBody = new ProgressRequestBody(selected_image, Constants.WN_MEDIA_TYPE_IMAGE, this);
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("", selected_image.getName(), fileBody);
+
+        Call<UploadPictureModel.GroupVideoList> call = mApiService.GetPicturePost(getString(R.string.add_post_v5),
+                filePart, RequestBody.create(MediaType.parse(Constants.WN_MEDIA_TYPE_TEXT), postData.toString()), globals.getUserDetails().getStatus().getUserId());
+
+        call.enqueue(new Callback<UploadPictureModel.GroupVideoList>() {
+            @Override
+            public void onResponse(@NonNull Call<UploadPictureModel.GroupVideoList> call, @NonNull Response<UploadPictureModel.GroupVideoList> response) {
+                ll_upload_progress.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    Globals.showToast(mContext, getString(R.string.msg_picture_shared));
+                    startActivity(new Intent(mContext, HomePageActivity.class));
+                    mContext.finish();
+                } else {
+                    Globals.showToast(mContext, response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UploadPictureModel.GroupVideoList> call, @NonNull Throwable t) {
+                ll_upload_progress.setVisibility(View.GONE);
+                Globals.showToast(getActivity(), getString(R.string.msg_server_error));
+            }
+        });
+    }
+
+    @Override
+    public void onProgressUpdate(int percentage) {
+        progress_uploading.setProgress(percentage);
+    }
+
+    @Override
+    public void onError() {
+        Globals.showToast(mContext, getString(R.string.msg_server_error));
+    }
+
+    @Override
+    public void onFinish() {
+        progress_uploading.setProgress(100);
+    }
+
+    @Override
+    public void onPause() {
+        if (ll_upload_progress.getVisibility() == View.VISIBLE) {
+            RetrofitClient.cancelAllRequest();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        if (ll_upload_progress.getVisibility() == View.VISIBLE) {
+            RetrofitClient.cancelAllRequest();
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+
+            if (requestCode == Constants.WN_UPLOAD_PICTURE && data != null) {
+                tagListModels = (ArrayList<TagListModel>) data.getSerializableExtra(Constants.WN_X);
+                List<String> list = new ArrayList<>();
+                for (int i = 0; i < tagListModels.size(); i++) {
+                    list.add(tagListModels.get(i).getUsername());
+                }
+                tag_list = TextUtils.join(", ", list);
+                if (tag_list != null) {
+                    tv_tag_people.setText(tag_list);
+                } else {
+                    tv_tag_people.setText(R.string.text_tap_tag_people);
+                }
+            }
+
+            if (requestCode == Constants.WN_CAPTION && data != null) {
+                caption = data.getStringExtra(Constants.WN_SHARED_VIDEO_CAPTION);
+                tv_write_caption.setText(caption);
+            }
+        }
+    }
+}
+

@@ -1,0 +1,313 @@
+package com.app.whosnextapp.breastCancerLegacies;
+
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.ConnectionDetector;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.homepage.SharePostActivity;
+import com.app.whosnextapp.model.GetAllBreastCancerLegaciesModel;
+import com.app.whosnextapp.model.GetAllCommentsByBreastCancerLegacyModel;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.navigationmenu.OtherUserProfileActivity;
+import com.app.whosnextapp.notification.ProfileVideoPlayerActivity;
+import com.app.whosnextapp.utility.ConstantEnum;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class BreastCancerLegaciesFragment extends Fragment implements BreastCancerLegaciesAdapter.OnItemClick {
+    @BindView(R.id.rv_cancer)
+    RecyclerView rv_cancer;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+
+    Globals globals;
+    Boolean IsLikeValue;
+    GetAllBreastCancerLegaciesModel getAllBreastCancerLegaciesModel;
+    BreastCancerLegaciesAdapter breastCancerLegaciesAdapter;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_breast_cancer_legacies, container, false);
+        ButterKnife.bind(this, v);
+        setHasOptionsMenu(true);
+        init();
+        return v;
+    }
+
+    private void init() {
+        if (getActivity() != null) {
+            globals = (Globals) getActivity().getApplicationContext();
+        }
+    }
+
+    @OnClick(R.id.fab)
+    public void onFabButtonClick() {
+        Intent intent = new Intent(getActivity(), AddNewActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        doRequestForBreastCancerData();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.home_page_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.header_refresh).setVisible(true);
+        menu.findItem(R.id.header_bell).setVisible(false);
+        menu.findItem(R.id.header_search).setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.header_refresh) {
+            doRequestForBreastCancerData();
+        }
+        return false;
+    }
+
+    //Display All BCL Post
+
+    public void doRequestForBreastCancerData() {
+        String requestURL = String.format(getString(R.string.get_all_breast_cancer_legacies), 1);
+        new PostRequest(getActivity(), null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                getAllBreastCancerLegaciesModel = new Gson().fromJson(response, GetAllBreastCancerLegaciesModel.class);
+                if (getAllBreastCancerLegaciesModel != null && getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList() != null && !getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().isEmpty()) {
+                    setBreastCancerLegaciesAdapter(getAllBreastCancerLegaciesModel);
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    public void setBreastCancerLegaciesAdapter(GetAllBreastCancerLegaciesModel breastCancerLegaciesLists) {
+        if (breastCancerLegaciesAdapter == null) {
+            breastCancerLegaciesAdapter = new BreastCancerLegaciesAdapter(getActivity(), this);
+        }
+        if (rv_cancer.getAdapter() == null) {
+            rv_cancer.setHasFixedSize(true);
+            rv_cancer.setLayoutManager(new LinearLayoutManager(getActivity()));
+            rv_cancer.setAdapter(breastCancerLegaciesAdapter);
+        }
+        breastCancerLegaciesAdapter.doRefresh(breastCancerLegaciesLists);
+    }
+
+    @Override
+    public void viewAllComments(GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList breastCancerLegaciesLists, final int position) {
+        String requestURL = String.format(getString(R.string.get_all_comment_by_breast_cancer),
+                String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getBreastCancerLegacyId()), "1");
+        new PostRequest(getActivity(), null, requestURL, false, false, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetAllCommentsByBreastCancerLegacyModel getAllCommentsByBreastCancerLegacyModel = new Gson().fromJson(response, GetAllCommentsByBreastCancerLegacyModel.class);
+                if (getAllCommentsByBreastCancerLegacyModel != null && getAllCommentsByBreastCancerLegacyModel.getBCLCommentList() != null && !getAllCommentsByBreastCancerLegacyModel.getBCLCommentList().isEmpty()) {
+                    getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).setBCLCommentList(getAllCommentsByBreastCancerLegacyModel.getBCLCommentList());
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void viewComments(int position) {
+        Intent intent = new Intent(getContext(), BreastCommentActivity.class);
+        intent.putExtra(Constants.WN_BREAST_CANCER_LEGACY_ID, String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getBreastCancerLegacyId()));
+        intent.putExtra(Constants.WN_CUSTOMER_ID, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onNameClick(int position) {
+        Intent intent = new Intent(getContext(), ProfileActivity.class);
+        intent.putExtra(Constants.WN_BREAST_CANCER_LEGACY_ID, String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getBreastCancerLegacyId()));
+        intent.putExtra(Constants.WN_BREAST_CANCER_IMAGE_URL, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getImageUrl());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickUsername(int position) {
+        Intent intent = new Intent(getContext(), OtherUserProfileActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickLike(GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList breastCancerLegaciesLists, final int position) {
+        if (!ConnectionDetector.internetCheck(getActivity(), false))
+            return;
+        IsLikeValue = getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getIsLiked();
+
+        final String requestURL = String.format(getString(R.string.like_unlike_breast_cancer_legacy),
+                String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getBreastCancerLegacyId()),
+                IsLikeValue ? 0 : 1);
+
+        new PostRequest(getActivity(), null, requestURL, false, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onClickProfile(int position) {
+        Intent intent = new Intent(getContext(), ProfileVideoPlayerActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickShare(int position) {
+        Intent intent = new Intent(getContext(), SharePostActivity.class);
+        intent.putExtra(Constants.WN_PICTURE_PATH, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getImageUrl());
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getMainPostId()));
+        intent.putExtra(Constants.WN_Post_Type, ConstantEnum.PostType.BCL.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickOption(int position) {
+
+        if (globals.getUserDetails().getStatus().getCustomerId().equalsIgnoreCase(String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(position).getCustomerId()))) {
+            showEditAndDeleteDialog(position);
+        } else {
+            showReportDialog(position);
+        }
+
+    }
+
+    private void doRequestForReport(int i) {
+        JSONObject postData = HttpRequestHandler.getInstance().getReportJson(String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getFlowerType()), String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getMainPostId()), Constants.WN_REPORT_COMMENT);
+
+        new PostRequest(getActivity(), postData, getString(R.string.report_problem), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel updateCustomerProfileModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (updateCustomerProfileModel != null) {
+                    if (updateCustomerProfileModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        Globals.showToast(getActivity(), getString(R.string.text_report_msg));
+                    } else {
+                        Globals.showToast(getActivity(), getString(R.string.msg_server_error));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void showReportDialog(int i) {
+        CharSequence[] options = new CharSequence[]{getString(R.string.text_report), getString(R.string.cancel)};
+        globals.show_dialog(getContext(), getString(R.string.text_select_option), "", options, true,
+                (DialogInterface dialog, int item) -> {
+                    switch (item) {
+                        case 0:
+                            doRequestForReport(i);
+                            break;
+                        case 1:
+                            dialog.dismiss();
+                            break;
+                    }
+                });
+    }
+
+
+    private void showEditAndDeleteDialog(int i) {
+        CharSequence[] options = new CharSequence[]{getString(R.string.text_edit_post), getString(R.string.text_delete_post)};
+        globals.show_dialog(getContext(), getString(R.string.text_select_option),
+                "", options, true,
+                (DialogInterface dialog, int item) -> {
+                    switch (item) {
+                        case 0:
+                            Intent intent = new Intent(getContext(), AddNewActivity.class);
+                            intent.putExtra(Constants.WN_PICTURE_PATH, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getImageUrl());
+                            intent.putExtra(Constants.WN_NAME, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getName());
+                            intent.putExtra(Constants.WN_BREAST_CANCER_LEGACY_ID, String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getBreastCancerLegacyId()));
+                            intent.putExtra(Constants.WN_IS_WHITE_CARNATION, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getIsWhiteCarnation());
+                            intent.putExtra(Constants.WN_IS_PINK_WHITE_CARNATION, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getIsPinkWhiteCarnation());
+                            intent.putExtra(Constants.WN_IS_STRIPED_CARNATION, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getIsStripedCarnation());
+                            intent.putExtra(Constants.WN_FLOWER_TYPE, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getFlowerType());
+                            intent.putExtra(Constants.WN_POST_ID, String.valueOf(getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getMainPostId()));
+                            intent.putExtra(Constants.WN_DESCRIPTION, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getDescription());
+                            intent.putExtra(Constants.WN_DOB, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getDOB());
+                            intent.putExtra(Constants.WN_DOP, getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getDOP());
+                            getActivity().startActivity(intent);
+                            break;
+                        case 1:
+                            doRequestForDeletePost(i);
+                            break;
+                    }
+                });
+    }
+
+    // Delete BCL Post
+
+    private void doRequestForDeletePost(int i) {
+        String requestUrl = String.format(getString(R.string.delete_bcl_legacy), getAllBreastCancerLegaciesModel.getBreastCancerLegaciesListArrayList().get(i).getBreastCancerLegacyId());
+        new PostRequest(getActivity(), null, requestUrl, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel.getResult().equalsIgnoreCase(Constants.WN_SUCCESS)) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragContent, new BreastCancerLegaciesFragment()).commit();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+}

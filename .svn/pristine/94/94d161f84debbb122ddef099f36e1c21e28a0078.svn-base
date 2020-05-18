@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".messaging.SelectPeopleActivity">
+
+    <FrameLayout
+        android:id="@+id/fl_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dim_50"
+        android:background="@drawable/header_bg">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="@dimen/dim_10"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:textAllCaps="true"
+            android:text="@string/text_select_people"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_margin="@dimen/dim_10"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:textAllCaps="true"
+            android:text="@string/cancel"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+    </FrameLayout>
+
+    <include layout="@layout/layout_spinner_search" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_people"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

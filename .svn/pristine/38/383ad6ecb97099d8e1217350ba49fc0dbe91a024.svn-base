@@ -1,0 +1,111 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.widget.AppCompatEditText;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.loginregistration.LoginActivity;
+import com.app.whosnextapp.model.ResetPasswordModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class ChangePasswordActivity extends BaseAppCompatActivity {
+
+    @BindView(R.id.et_current_password)
+    AppCompatEditText et_current_password;
+    @BindView(R.id.et_new_password)
+    AppCompatEditText et_new_password;
+    @BindView(R.id.et_retype_new_password)
+    AppCompatEditText et_retype_new_password;
+
+    Globals globals;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_change_password);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+
+    }
+
+    @OnClick(R.id.btn_update)
+    public void onUpdatePasword() {
+        if (IsValid()) {
+            doRequestToUpdatePassword();
+        }
+    }
+
+    private void doRequestToUpdatePassword() {
+        String requestURL = getString(R.string.get_change_password_url);
+        JSONObject postData = HttpRequestHandler.getInstance().getChangePasswordJson(et_current_password.getText().toString(), et_new_password.getText().toString());
+
+        new PostRequest(this, postData, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                ResetPasswordModel resetPasswordModel = new Gson().fromJson(response, ResetPasswordModel.class);
+                if (resetPasswordModel != null) {
+                    if (resetPasswordModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        globals.setUserDetails(null);
+                        startActivity(new Intent(ChangePasswordActivity.this, LoginActivity.class));
+                        Globals.showToast(ChangePasswordActivity.this, getString(R.string.msg_password_change_success));
+                        finish();
+                    } else {
+                        Globals.showToast(ChangePasswordActivity.this, getString(R.string.msg_server_error_wrong_password));
+                    }
+                } else {
+                    Globals.showToast(ChangePasswordActivity.this, getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(ChangePasswordActivity.this, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private boolean IsValid() {
+        if (et_current_password.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_current_password));
+            return false;
+        }
+        if (et_new_password.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_password));
+            return false;
+        }
+        if (et_retype_new_password.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_retype_password));
+            return false;
+        }
+        if (et_new_password.length()<=6) {
+            Globals.showToast(this, getString(R.string.err_min_length_password));
+            return false;
+        }
+        if (!et_retype_new_password.getText().toString().trim().equals(et_new_password.getText().toString().trim())) {
+            Globals.showToast(this, getString(R.string.err_password_not_equals));
+            return false;
+        }
+        if (et_current_password.getText().toString().trim().equals(et_new_password.getText().toString().trim())) {
+            Globals.showToast(this, getString(R.string.err_password_and_new_password_are_same));
+            return false;
+        }
+        return true;
+    }
+}

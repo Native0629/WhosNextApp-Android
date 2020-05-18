@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".notification.NotificationActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:id="@+id/ll_follower_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_follower_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_10"
+            android:layout_marginLeft="@dimen/dim_10"
+            android:layout_marginTop="@dimen/dim_12"
+            android:layout_marginBottom="@dimen/dim_5"
+            android:fontFamily="@font/aboxfor2"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_size_25"
+            tools:ignore="RtlHardcoded" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_follow_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_10"
+            android:layout_marginLeft="@dimen/dim_10"
+            android:layout_marginTop="@dimen/dim_5"
+            android:layout_marginBottom="@dimen/dim_5"
+            android:fontFamily="@font/aboxfor"
+            android:text="@string/text_follow_request_approve"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_size_22"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dim_1"
+        android:layout_margin="@dimen/dim_10"
+        android:background="@color/gray"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_notification"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

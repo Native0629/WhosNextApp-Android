@@ -1,0 +1,182 @@
+package com.app.whosnextapp.model;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class LoginModel implements Serializable {
+
+    @SerializedName("Status")
+    private Status Status;
+
+    public Status getStatus() {
+        return Status;
+    }
+
+    public void setStatus(Status Status) {
+        this.Status = Status;
+    }
+
+    public static class Status implements Serializable {
+        @SerializedName("VerificationCode")
+        private String VerificationCode;
+        @SerializedName("UserName")
+        private String UserName;
+        @SerializedName("UserId")
+        private String UserId;
+        @SerializedName("TotalPost")
+        private String TotalPost;
+        @SerializedName("TotalFollowings")
+        private String TotalFollowings;
+        @SerializedName("TotalFollowers")
+        private String TotalFollowers;
+        @SerializedName("Timer")
+        private int Timer;
+        @SerializedName("Result")
+        private String Result;
+        @SerializedName("ProfilePicUrl")
+        private String ProfilePicUrl;
+        @SerializedName("NotificationCount")
+        private int NotificationCount;
+        @SerializedName("Name")
+        private String Name;
+        @SerializedName("IsSnippets")
+        private boolean IsSnippets;
+        @SerializedName("IsAdmin")
+        private boolean IsAdmin;
+        @SerializedName("Email")
+        private String Email;
+        @SerializedName("CustomerId")
+        private String CustomerId;
+        @SerializedName("ChatId")
+        private String ChatId;
+
+        public String getVerificationCode() {
+            return VerificationCode;
+        }
+
+        public void setVerificationCode(String VerificationCode) {
+            this.VerificationCode = VerificationCode;
+        }
+
+        public String getUserName() {
+            return UserName;
+        }
+
+        public void setUserName(String UserName) {
+            this.UserName = UserName;
+        }
+
+        public String getUserId() {
+            return UserId;
+        }
+
+        public void setUserId(String UserId) {
+            this.UserId = UserId;
+        }
+
+        public String getTotalPost() {
+            return TotalPost;
+        }
+
+        public void setTotalPost(String TotalPost) {
+            this.TotalPost = TotalPost;
+        }
+
+        public String getTotalFollowings() {
+            return TotalFollowings;
+        }
+
+        public void setTotalFollowings(String TotalFollowings) {
+            this.TotalFollowings = TotalFollowings;
+        }
+
+        public String getTotalFollowers() {
+            return TotalFollowers;
+        }
+
+        public void setTotalFollowers(String TotalFollowers) {
+            this.TotalFollowers = TotalFollowers;
+        }
+
+        public int getTimer() {
+            return Timer;
+        }
+
+        public void setTimer(int Timer) {
+            this.Timer = Timer;
+        }
+
+        public String getResult() {
+            return Result;
+        }
+
+        public void setResult(String Result) {
+            this.Result = Result;
+        }
+
+        public String getProfilePicUrl() {
+            return ProfilePicUrl;
+        }
+
+        public void setProfilePicUrl(String ProfilePicUrl) {
+            this.ProfilePicUrl = ProfilePicUrl;
+        }
+
+        public int getNotificationCount() {
+            return NotificationCount;
+        }
+
+        public void setNotificationCount(int NotificationCount) {
+            this.NotificationCount = NotificationCount;
+        }
+
+        public String getName() {
+            return Name;
+        }
+
+        public void setName(String Name) {
+            this.Name = Name;
+        }
+
+        public boolean getIsSnippets() {
+            return IsSnippets;
+        }
+
+        public void setIsSnippets(boolean IsSnippets) {
+            this.IsSnippets = IsSnippets;
+        }
+
+        public boolean getIsAdmin() {
+            return IsAdmin;
+        }
+
+        public void setIsAdmin(boolean IsAdmin) {
+            this.IsAdmin = IsAdmin;
+        }
+
+        public String getEmail() {
+            return Email;
+        }
+
+        public void setEmail(String Email) {
+            this.Email = Email;
+        }
+
+        public String getCustomerId() {
+            return CustomerId;
+        }
+
+        public void setCustomerId(String CustomerId) {
+            this.CustomerId = CustomerId;
+        }
+
+        public String getChatId() {
+            return ChatId;
+        }
+
+        public void setChatId(String ChatId) {
+            this.ChatId = ChatId;
+        }
+    }
+}

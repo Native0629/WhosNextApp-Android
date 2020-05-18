@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_240"
+                android:layout_gravity="center"
+                android:background="@drawable/banner"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_30" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="@dimen/dim_35"
+                    android:layout_height="@dimen/dim_35"
+                    android:layout_marginTop="@dimen/dim_15"
+                    android:src="@drawable/start" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/dim_30"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/dim_20"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/tv_countpost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:text="@string/posts"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/dim_90"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/tv_countfollowers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:text="@string/followers"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/dim_50"
+                        android:layout_marginRight="@dimen/dim_20"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/tv_countfollowing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/aboxfor2"
+                            android:text="@string/following"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_25" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="@string/introduction_bio_video"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+
+                <VideoView
+                    android:id="@+id/videoView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dim_300"
+                    android:layout_gravity="center" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="@string/about_self"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_views"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/dim_100"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:padding="@dimen/dim_10"
+                    android:text="@string/views"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/lightgray"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_about_self"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="@string/city"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/lightgray"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="@string/category"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/lightgray"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="@dimen/dim_30"
+                    android:layout_height="@dimen/dim_30"
+                    android:layout_marginTop="@dimen/dim_40"
+                    android:button="@drawable/checkbox"
+                    android:paddingLeft="@dimen/dim_5"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_18" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/dim_10">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/aboxfor"
+                        android:text="@string/make_this_profile_private"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:text="@string/profile_is_private"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_16" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_editprofile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="@string/edit_profile"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dim_10"
+                    android:fontFamily="@font/aboxfor2"
+                    android:text="DEACTIVE ACCOUNT"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_25" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dim_10">
+
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dim_10"
+                    android:fontFamily="@font/blowbrush"
+                    android:text="GROUP ViDEO"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_25" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

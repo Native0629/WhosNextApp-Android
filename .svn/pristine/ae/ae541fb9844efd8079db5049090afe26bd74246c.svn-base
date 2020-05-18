@@ -1,0 +1,21 @@
+package com.app.whosnextapp.model;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class GetAllPicturesModel implements Serializable {
+
+
+    @SerializedName("PostList")
+    private List<String> PostList;
+
+    public List<String> getPostList() {
+        return PostList;
+    }
+
+    public void setPostList(List<String> PostList) {
+        this.PostList = PostList;
+    }
+}

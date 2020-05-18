@@ -1,0 +1,95 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/banner"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:padding="15dp"
+            android:paddingTop="@dimen/dim_10"
+            app:srcCompat="@drawable/ic_menubar" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="@dimen/dim_60"
+            android:layout_height="@dimen/dim_60"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/logo" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/dim_60"
+            android:paddingTop="@dimen/dim_40"
+            android:paddingRight="@dimen/dim_60"
+            android:paddingBottom="@dimen/dim_40">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_current_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/current_password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/new_password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_retype_new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/retype_new_password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/rounded_button"
+                android:padding="@dimen/dim_15"
+                android:text="@string/update"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_16" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <include layout="@layout/child_progress_bar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_snippet_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:foreground="@drawable/border_imageview"
+                android:minHeight="@dimen/dim_200"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/tap_mic_image" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:text="@string/text_write_snippet"
+                android:textAllCaps="true"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_snippet_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:background="@color/gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="start"
+                android:hint="@string/text_enter_caption"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:padding="@dimen/dim_5"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:padding="@dimen/dim_5"
+                android:text="@string/text_record_description"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_22" />
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_18"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dim_25"
+                android:layout_marginBottom="@dimen/dim_25"
+                app:srcCompat="@drawable/start_icon" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/sky"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:text="@string/save"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:padding="@dimen/dim_5" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_people"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:padding="@dimen/dim_5" />
+        </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dim_2"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+        <com.linkedin.android.spyglass.ui.MentionsEditText
+            android:id="@+id/et_comment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:gravity="center_vertical"
+            android:hint="@string/add_a_comment"
+            android:maxLines="4"
+            android:padding="@dimen/dim_10"
+            android:textAllCaps="false"
+            android:textColorHint="@color/gray"
+            app:mentionTextColor="@color/red"
+            app:selectedMentionTextColor="@color/red" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/sky"
+            android:padding="@dimen/dim_15"
+            android:src="@drawable/sendbtn" />
+    </LinearLayout>
+</LinearLayout>

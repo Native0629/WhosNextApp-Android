@@ -1,0 +1,127 @@
+package com.app.whosnextapp.loginregistration;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+
+import androidx.appcompat.widget.AppCompatEditText;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.model.UserDetailModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class LoginActivity extends BaseAppCompatActivity {
+    @BindView(R.id.et_username)
+    AppCompatEditText et_username;
+    @BindView(R.id.et_password)
+    AppCompatEditText et_password;
+
+    Globals globals;
+
+    private Activity getActivity() {
+        return LoginActivity.this;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+        init();
+    }
+
+    public void init() {
+        globals = (Globals) getApplicationContext();
+    }
+
+    @OnClick(R.id.btn_login)
+    public void onLoginClick() {
+        if (isValid()) {
+            doRequestForLogin();
+        }
+    }
+
+    private boolean isValid() {
+        if (et_username.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_user_name));
+            return false;
+        }
+        if (et_password.getText().toString().trim().isEmpty()) {
+            Globals.showToast(LoginActivity.this, getString(R.string.err_empty_password));
+            return false;
+        }
+        return true;
+    }
+
+    public void doRequestForLogin() {
+        JSONObject postData = HttpRequestHandler.getInstance()
+                .getLoginJson(globals.getFCM_DeviceToken(), et_username.getText().toString(), Constants.WN_ANDROID, et_password.getText().toString());
+
+        new PostRequest(this, postData, getString(R.string.get_login_url), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                UserDetailModel userDetailModel = new Gson().fromJson(response, UserDetailModel.class);
+                if (userDetailModel != null) {
+                    if (userDetailModel.getStatus().getResult().equals(Constants.WN_SUCCESS)) {
+                        userDetailModel.getStatus().setPassword(et_password.getText().toString());
+                        globals.setUserDetails(userDetailModel);
+                        Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
+                        intent.putExtra(Constants.WN_USERNAME, userDetailModel.getStatus().getUserName());
+                        intent.putExtra(Constants.WN_USER_ID, userDetailModel.getStatus().getUserId());
+                        intent.putExtra(Constants.WN_CUSTOMER_ID, userDetailModel.getStatus().getCustomerId());
+                        startActivity(intent);
+                        finishAffinity();
+                    } else {
+                        Globals.showToast(LoginActivity.this, getString(R.string.err_username_password_in_correct));
+                    }
+                } else {
+                    Globals.showToast(LoginActivity.this, getString(R.string.err_username_password_in_correct));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(LoginActivity.this, msg);
+            }
+        }).execute();
+    }
+
+    @OnClick(R.id.btn_create_your_account)
+    public void onRegister() {
+        startActivity(new Intent(getActivity(), RegistrationActivity.class));
+    }
+
+    @OnClick(R.id.tv_forgot_your_password)
+    public void onForgotPasswordClick() {
+        startActivity(new Intent(getActivity(), ForgotPasswordActivity.class));
+    }
+
+    @OnClick(R.id.tv_privacy_policy)
+    public void onPrivacyPolicyClick() {
+        Intent intent = new Intent(this, TermConditionActivity.class);
+        intent.putExtra(Constants.WN_TERMS_CONDITION, getString(R.string.url_privacy_policy));
+        intent.putExtra(Constants.WN_POLICY, Constants.WN_PRIVACY_POLICY);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_terms_condition)
+    public void onTermConditionClick() {
+        Intent intent = new Intent(this, TermConditionActivity.class);
+        intent.putExtra(Constants.WN_TERMS_CONDITION, getString(R.string.url_term_condition));
+        intent.putExtra(Constants.WN_POLICY, Constants.WN_TERMS_CONDITION);
+        startActivity(intent);
+    }
+}

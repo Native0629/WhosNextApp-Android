@@ -1,0 +1,99 @@
+package com.app.whosnextapp.fcm;
+
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.messaging.MessagingChatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.orhanobut.logger.Logger;
+
+public class MyFcmListenerService extends FirebaseMessagingService {
+
+    static Globals globals;
+
+    public static void showChatNotification(Context context, Class<? extends AppCompatActivity> activityClass,
+                                            String name, String message, String dialogID,
+                                            String UserId,
+                                            boolean isFromNotification) {
+        globals = (Globals) context.getApplicationContext();
+        if (dialogID != null && globals.getUserDetails() != null) {
+            Intent intent = new Intent(context, activityClass);
+            intent.putExtra(Constants.WN_From_notification, isFromNotification);
+            intent.putExtra(Constants.WN_DIALOG_ID, dialogID);
+            intent.putExtra(Constants.WN_NAME, name);
+            intent.putExtra(Constants.WN_USER_ID, UserId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PushNotification(context, name, message, intent);
+        }
+    }
+
+    private static void PushNotification(Context context, String name, String message, Intent intent) {
+        int NOTIFICATION_ID = (int) System.currentTimeMillis();
+        String channel_id = "2";
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //   Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channel_id)
+                .setColor(ContextCompat.getColor(context, R.color.blue))
+                .setSmallIcon((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? R.drawable.logo : R.mipmap.ic_launcher)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(name)
+                .setContentText(message)
+                .setTicker(message)
+                .setAutoCancel(true)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(channel_id, context.getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH);
+            mChannel.enableLights(true);
+            mChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
+    @Override
+    public void onNewToken(String token) {
+        super.onNewToken(token);
+        globals = (Globals) getApplicationContext();
+        globals.setFCM_DeviceToken(token);
+        Logger.e("FCM token: " + globals.getFCM_DeviceToken());
+    }
+
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        String dialogId = remoteMessage.getData().get(Constants.WN_DIALOG_ID);
+        String username = remoteMessage.getData().get(Constants.WN_NAME);
+        String message = remoteMessage.getData().get(Constants.WN_body);
+        String userId = remoteMessage.getData().get(Constants.WN_USER_ID);
+        showChatNotification(Globals.getContext(),
+                MessagingChatActivity.class,
+                String.valueOf(username),
+                message,
+                dialogId,
+                userId,
+                true);
+    }
+}

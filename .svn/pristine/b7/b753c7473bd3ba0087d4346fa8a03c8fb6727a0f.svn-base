@@ -1,0 +1,422 @@
+package com.app.whosnextapp.videos.groupvideo;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.BuildConstants;
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.APIService;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ProgressRequestBody;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.apis.RetrofitClient;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.model.AddUserInGroupVideo;
+import com.app.whosnextapp.model.CategoryModel;
+import com.app.whosnextapp.model.DiscoverModel;
+import com.app.whosnextapp.model.GroupListModel;
+import com.app.whosnextapp.model.TagListModel;
+import com.app.whosnextapp.model.UploadPictureModel;
+import com.app.whosnextapp.navigationmenu.OtherUserProfileActivity;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.notification.ProfileVideoPlayerActivity;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.app.whosnextapp.utility.Utility;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.app.whosnextapp.utility.Constants.WN_CUSTOMER_ID;
+
+public class InvitePeopleActivity extends BaseAppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, TextWatcher, InvitePeopleAdapter.OnCustomClickListener, ProgressRequestBody.UploadCallbacks, GroupListAdapter.OnCustomClickListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.rv_discover_people)
+    RecyclerView rv_discover_people;
+    @BindView(R.id.sp_category)
+    Spinner sp_category;
+    @BindView(R.id.et_search_people)
+    EditText et_search_people;
+    @BindView(R.id.rv_people_list)
+    RecyclerView rv_people_list;
+    @BindView(R.id.ll_upload_progress)
+    LinearLayout ll_upload_progress;
+    @BindView(R.id.progress_uploading)
+    ProgressBar progress_uploading;
+    @BindView(R.id.ll_cancel)
+    LinearLayout ll_cancel;
+
+    Globals globals;
+    InvitePeopleAdapter invitePeopleAdapter;
+    GroupListAdapter groupListAdapter;
+    String videoPath, videoDetail;
+    ArrayList<TagListModel> tagListModels = new ArrayList<>();
+    int imgHeight, imgWidth;
+    private ArrayList<CategoryModel.CategoryList> categoryLists = new ArrayList<>();
+    private ArrayList<DiscoverModel.CustomerList> customerLists = new ArrayList<>();
+    private ArrayList<GroupListModel.UserList> userLists = new ArrayList<>();
+
+    private Activity getActivity() {
+        return InvitePeopleActivity.this;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_invite_people);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        setActionBar();
+        ll_cancel.setVisibility(View.VISIBLE);
+        doRequestForCategory();
+        et_search_people.addTextChangedListener(this);
+        progress_uploading.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+        if (getIntent() != null) {
+            imgHeight = getIntent().getIntExtra(Constants.WN_POST_HEIGHT, 0);
+            imgWidth = getIntent().getIntExtra(Constants.WN_POST_WIDTH, 0);
+            videoDetail = getIntent().getStringExtra(Constants.WN_DESCRIPTION);
+            videoPath = getIntent().getStringExtra(Constants.WN_FILE_PATH);
+            tagListModels = (ArrayList<TagListModel>) getIntent().getSerializableExtra(Constants.WN_POST_TAG_LIST);
+        }
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        toolbar_title.setText(Constants.WN_VIDEOS);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    private void doRequestForCategory() {
+        new PostRequest(getActivity(), null, getString(R.string.get_talent_category_url), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                CategoryModel categoryModel = new Gson().fromJson(response, CategoryModel.class);
+                if (categoryModel != null && categoryModel.getCategoryList() != null) {
+                    categoryLists = categoryModel.getCategoryList();
+                    showListInSpinner();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute();
+    }
+
+    private void showListInSpinner() {
+        ArrayList<String> items = new ArrayList<>();
+        for (int i = 0; i < categoryLists.size(); i++) {
+            items.add(categoryLists.get(i).getCategoryName());
+        }
+        ArrayAdapter<String> adapter;
+        if (getApplicationContext() != null) {
+            adapter = new ArrayAdapter<>(getActivity(), R.layout.category_spinner_item, items);
+            adapter.setDropDownViewResource(R.layout.category_spinner_item);
+            sp_category.setAdapter(new com.app.whosnextapp.drawer.NothingSelectedSpinnerAdapter(adapter, R.layout.layout_nothing_selected_item_spinner, getActivity()));
+            sp_category.setOnItemSelectedListener(this);
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (position > 0) {
+            doRequestForDiscoverPeople(categoryLists.get(position - 1).getCategoryId());
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    private void doRequestForDiscoverPeople(Integer category_id) {
+        JSONObject postData = HttpRequestHandler.getInstance()
+                .getDiscoverPeopleJson(1, category_id, "");
+        new PostRequest(getActivity(), postData, getString(R.string.get_discover_people_url), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                DiscoverModel discoverModel = new Gson().fromJson(response, DiscoverModel.class);
+                if (discoverModel != null && discoverModel.getCustomerList() != null) {
+                    customerLists = discoverModel.getCustomerList();
+                    setDiscoverAdapter();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void setDiscoverAdapter() {
+        if (invitePeopleAdapter == null) {
+            invitePeopleAdapter = new InvitePeopleAdapter(getActivity(), this);
+        }
+        if (rv_discover_people.getAdapter() == null) {
+            rv_discover_people.setLayoutManager(new LinearLayoutManager(getActivity()));
+            rv_discover_people.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+            rv_discover_people.setAdapter(invitePeopleAdapter);
+        }
+        invitePeopleAdapter.doRefresh(customerLists);
+    }
+
+    private void setAdapter() {
+        if (groupListAdapter == null) {
+            groupListAdapter = new GroupListAdapter(getActivity(), this);
+        }
+        if (rv_people_list.getAdapter() == null) {
+            rv_people_list.setHasFixedSize(true);
+            rv_people_list.setLayoutManager(new GridLayoutManager(this, 5));
+            rv_people_list.setAdapter(groupListAdapter);
+        }
+        groupListAdapter.doRefresh(userLists);
+    }
+
+    @OnClick(R.id.tv_cancel)
+    public void onCancelClick() {
+        et_search_people.setText("");
+    }
+
+    @OnClick(R.id.btn_submit)
+    public void onSubmitClick() {
+        if (getIntent() != null && getIntent().hasExtra(Constants.WN_IS_REMOVE_GROUP)) {
+            if (userLists.size() > 1) {
+                Globals.showToast(getActivity(), getString(R.string.msg_err_must_invite_one_friends));
+            } else {
+                doRequestToAddUserInGroupVideo();
+            }
+        } else {
+            if (userLists.size() != 4) {
+                Globals.showToast(getActivity(), getString(R.string.msg_err_must_invite_friends));
+            } else {
+                doRequestForUploadGroupVideo();
+            }
+        }
+    }
+
+    private void doRequestToAddUserInGroupVideo() {
+        String customerId = "";
+        for (int i = 0; i < userLists.size(); i++) {
+            customerId = String.valueOf(userLists.get(i).getCustomerId());
+        }
+        JSONObject postData = HttpRequestHandler.getInstance().getUpdateGroupRequestUser(getIntent().getStringExtra(Constants.WN_POST_ID),
+                getIntent().getStringExtra(WN_CUSTOMER_ID), globals.getUserDetails().getStatus().getCustomerId(),
+                customerId);
+
+        new PostRequest(getActivity(), postData, getString(R.string.update_user_in_group_video), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                AddUserInGroupVideo addUserInGroupVideo = new Gson().fromJson(response, AddUserInGroupVideo.class);
+                if (addUserInGroupVideo != null && addUserInGroupVideo.getResult().equals(true)) {
+                    Globals.showToast(getActivity(), getString(R.string.msg_group_video_invite_success));
+                    startActivity(new Intent(getActivity(), NotificationActivity.class));
+                    finish();
+                } else {
+                    Globals.showToast(getActivity(), getString(R.string.err_fail_to_send));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void doRequestForUploadGroupVideo() {
+        if (videoPath != null && tagListModels != null) {
+            ll_upload_progress.setVisibility(View.VISIBLE);
+
+            File selected_video = new File(videoPath);
+            APIService mApiService = RetrofitClient.getClient(BuildConstants.BASE_URL).create(APIService.class);
+
+            JSONObject postData = HttpRequestHandler.getInstance().getUploadPictureJson(videoDetail,
+                    0, 0, 1, "", "", 0, 0,
+                    globals.getUserDetails().getStatus().getCustomerId(), imgWidth, Utility.getHeight(imgHeight, imgWidth, getActivity()), tagListModels);
+
+            ProgressRequestBody fileBody = new ProgressRequestBody(selected_video, Constants.WN_MEDIA_TYPE_VIDEO, this);
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("", selected_video.getName(), fileBody);
+
+            Call<UploadPictureModel.GroupVideoList> call = mApiService.GetPicturePost(getString(R.string.add_post_v5),
+                    filePart, RequestBody.create(MediaType.parse(Constants.WN_MEDIA_TYPE_TEXT), postData.toString()), globals.getUserDetails().getStatus().getUserId());
+
+            call.enqueue(new Callback<UploadPictureModel.GroupVideoList>() {
+                @Override
+                public void onResponse(Call<UploadPictureModel.GroupVideoList> call, Response<UploadPictureModel.GroupVideoList> response) {
+                    ll_upload_progress.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        doRequestForGroupVideoNotification(response.body().getPostId());
+                    } else {
+                        Globals.showToast(getActivity(), response.message());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UploadPictureModel.GroupVideoList> call, Throwable t) {
+                    ll_upload_progress.setVisibility(View.GONE);
+                    Globals.showToast(getActivity(), getString(R.string.msg_server_error));
+                }
+            });
+        }
+    }
+
+    private void doRequestForGroupVideoNotification(int postId) {
+        JSONObject postData = HttpRequestHandler.getInstance().getGroupVideoNotification
+                (postId, Integer.parseInt(globals.getUserDetails().getStatus().getCustomerId()), userLists);
+
+        new PostRequest(getActivity(), postData, getString(R.string.add_user_in_group_notification), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                AddUserInGroupVideo addUserInGroupVideo = new Gson().fromJson(response, AddUserInGroupVideo.class);
+                if (addUserInGroupVideo != null && addUserInGroupVideo.getResult().equals(true)) {
+                    Globals.showToast(getActivity(), getString(R.string.msg_group_video_invite_success));
+                    startActivity(new Intent(getActivity(), HomePageActivity.class));
+                    finish();
+                } else {
+                    Globals.showToast(getActivity(), getString(R.string.err_fail_to_send));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        searchPeople(s.toString().trim());
+    }
+
+    private void searchPeople(String text) {
+        if (invitePeopleAdapter != null) {
+            invitePeopleAdapter.getFilter().filter(text);
+        }
+    }
+
+    @Override
+    public void onFilter(boolean IsShow) {
+
+    }
+
+    @Override
+    public void onClickUsername(int position, View v) {
+        Intent intent = new Intent(getActivity(), OtherUserProfileActivity.class);
+        intent.putExtra(WN_CUSTOMER_ID, invitePeopleAdapter.getItems().get(position).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickProfile(int position, View v) {
+        Intent intent = new Intent(getActivity(), ProfileVideoPlayerActivity.class);
+        intent.putExtra(WN_CUSTOMER_ID, invitePeopleAdapter.getItems().get(position).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickInvite(int position, View v) {
+        if (userLists.size() >= 4) {
+            Globals.showToast(getActivity(), getString(R.string.err_msg_cannot_select_more_friends));
+        } else {
+            GroupListModel.UserList userList = new GroupListModel.UserList();
+            userList.setCustomerId(invitePeopleAdapter.getItems().get(position).getCustomerId());
+            userList.setUsername(invitePeopleAdapter.getItems().get(position).getUserName());
+            userList.setProfilePic(invitePeopleAdapter.getItems().get(position).getProfilePicUrl());
+            userList.setPosition(position);
+            userLists.add(userList);
+            setAdapter();
+            customerLists.remove(invitePeopleAdapter.getItems().get(position));
+            setDiscoverAdapter();
+        }
+    }
+
+    @Override
+    public void onClickRemove(int position, View v) {
+        DiscoverModel.CustomerList customerList = new DiscoverModel.CustomerList();
+        customerList.setCustomerId(groupListAdapter.getItems().get(position).getCustomerId());
+        customerList.setUserName(groupListAdapter.getItems().get(position).getUsername());
+        customerList.setProfilePicUrl(groupListAdapter.getItems().get(position).getProfilePic());
+        customerLists.add(userLists.get(position).getPosition(), customerList);
+        invitePeopleAdapter.doRefresh(customerLists);
+        userLists.remove(groupListAdapter.getItems().get(position));
+        groupListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onProgressUpdate(int percentage) {
+        progress_uploading.setProgress(percentage);
+    }
+
+    @Override
+    public void onError() {
+        Globals.showToast(getActivity(), getString(R.string.msg_server_error));
+    }
+
+    @Override
+    public void onFinish() {
+        progress_uploading.setProgress(100);
+    }
+}

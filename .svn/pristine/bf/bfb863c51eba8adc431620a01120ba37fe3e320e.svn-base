@@ -1,0 +1,223 @@
+package com.app.whosnextapp.breastCancerLegacies;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.model.GetAllBreastCancerLegaciesModel;
+import com.app.whosnextapp.model.GetAllCommentsByBreastCancerLegacyModel;
+import com.app.whosnextapp.utility.TimeUtils;
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class BreastCancerLegaciesAdapter extends RecyclerView.Adapter<BreastCancerLegaciesAdapter.BreastCancerLegaciesViewHolder> {
+    private Context context;
+    private OnItemClick onItemClick;
+    private ArrayList<GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList> breastCancerLegaciesLists;
+
+    BreastCancerLegaciesAdapter(Context context, OnItemClick onItemClick) {
+        this.context = context;
+        this.onItemClick = onItemClick;
+    }
+
+    public void doRefresh(GetAllBreastCancerLegaciesModel breastCancerLegaciesLists) {
+        this.breastCancerLegaciesLists = breastCancerLegaciesLists.getBreastCancerLegaciesListArrayList();
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public BreastCancerLegaciesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.child_breast_cancer_layout, viewGroup, false);
+        return new BreastCancerLegaciesViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull BreastCancerLegaciesViewHolder breastCancerLegaciesViewHolder, int i) {
+        breastCancerLegaciesViewHolder.setBreastCancerLegaciesData(breastCancerLegaciesLists, i);
+        breastCancerLegaciesViewHolder.setViewCommentAdapter(breastCancerLegaciesLists.get(i).getBCLCommentList());
+    }
+
+    @Override
+    public int getItemCount() {
+        return breastCancerLegaciesLists.size();
+    }
+
+    interface OnItemClick {
+        void viewAllComments(GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList breastCancerLegaciesLists, int position);
+
+        void viewComments(int position);
+
+        void onNameClick(int position);
+
+        void onClickUsername(int position);
+
+        void onClickLike(GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList breastCancerLegaciesLists, int position);
+
+        void onClickProfile(int position);
+
+        void onClickShare(int position);
+
+        void onClickOption(int position);
+    }
+
+    class BreastCancerLegaciesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.profile_image)
+        CircleImageView profile_image;
+        @BindView(R.id.tv_username)
+        AppCompatTextView tv_username;
+        @BindView(R.id.tv_time)
+        AppCompatTextView tv_time;
+        @BindView(R.id.tv_name)
+        AppCompatTextView tv_name;
+        @BindView(R.id.tv_description)
+        AppCompatTextView tv_description;
+        @BindView(R.id.rv_bcl_comment)
+        RecyclerView rv_bcl_comment;
+        @BindView(R.id.tv_total_comments)
+        AppCompatTextView tv_total_comments;
+        @BindView(R.id.Image_view)
+        AppCompatImageView Image_view;
+        @BindView(R.id.ll_view_allComment)
+        LinearLayout ll_view_allComment;
+        @BindView(R.id.btn_likes)
+        AppCompatCheckBox btn_likes;
+        @BindView(R.id.iv_mike)
+        AppCompatImageView iv_mike;
+        @BindView(R.id.iv_image)
+        CircleImageView iv_image;
+        @BindView(R.id.tv_date)
+        AppCompatTextView tv_date;
+        @BindView(R.id.ll_view_Comment)
+        LinearLayout ll_view_Comment;
+        @BindView(R.id.iv_shared)
+        AppCompatImageView iv_shared;
+        @BindView(R.id.iv_option)
+        AppCompatImageView iv_option;
+
+        ViewAllBCLCommentAdapter viewAllBCLCommentAdapter;
+
+        BreastCancerLegaciesViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+            iv_mike.setOnClickListener(this);
+            ll_view_Comment.setOnClickListener(this);
+            tv_username.setOnClickListener(this);
+            profile_image.setOnClickListener(this);
+            tv_name.setOnClickListener(this);
+            btn_likes.setOnClickListener(this);
+            iv_shared.setOnClickListener(this);
+            iv_option.setOnClickListener(this);
+        }
+
+        void setBreastCancerLegaciesData(final ArrayList<GetAllBreastCancerLegaciesModel.BreastCancerLegaciesList> breastCancerLegaciesLists, final int i) {
+            tv_username.setText(breastCancerLegaciesLists.get(i).getUserName());
+            Glide.with(context).load(breastCancerLegaciesLists.get(i).getProfilePicUrl()).into(profile_image);
+            tv_time.setText(TimeUtils.getTimeDiff(context, Long.parseLong(breastCancerLegaciesLists.get(i).getTimeDiff())));
+            tv_name.setText(breastCancerLegaciesLists.get(i).getName());
+            tv_description.setText(breastCancerLegaciesLists.get(i).getDescription());
+            tv_total_comments.setText(String.valueOf(breastCancerLegaciesLists.get(i).getTotalComments()));
+            Glide.with(context).load(breastCancerLegaciesLists.get(i).getImageUrl()).into(Image_view);
+            btn_likes.setChecked(breastCancerLegaciesLists.get(i).getIsLiked());
+            tv_date.setText(breastCancerLegaciesLists.get(i).getDOB());
+
+            onItemClick.viewAllComments(breastCancerLegaciesLists.get(getAdapterPosition()), i);
+
+            if (breastCancerLegaciesLists.get(i).getFlowerType() == 0) {
+                Glide.with(context)
+                        .load(context.getResources().getDrawable(R.drawable.flower1))
+                        .into(iv_image);
+            } else if (breastCancerLegaciesLists.get(i).getFlowerType() == 1) {
+                Glide.with(context)
+                        .load(context.getResources().getDrawable(R.drawable.flower2))
+                        .into(iv_image);
+            } else if (breastCancerLegaciesLists.get(i).getFlowerType() == 2) {
+                Glide.with(context)
+                        .load(context.getResources().getDrawable(R.drawable.flower2))
+                        .into(iv_image);
+            } else {
+                iv_image.setVisibility(View.GONE);
+            }
+        }
+
+        void setViewCommentAdapter(ArrayList<GetAllCommentsByBreastCancerLegacyModel.BCLCommentList> BCLCommentList) {
+            if (viewAllBCLCommentAdapter == null) {
+                viewAllBCLCommentAdapter = new ViewAllBCLCommentAdapter(context);
+            }
+            if (rv_bcl_comment.getAdapter() == null) {
+                rv_bcl_comment.setHasFixedSize(false);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                rv_bcl_comment.setLayoutManager(layoutManager);
+                rv_bcl_comment.setAdapter(viewAllBCLCommentAdapter);
+            }
+
+            if (BCLCommentList != null) {
+                ArrayList<GetAllCommentsByBreastCancerLegacyModel.BCLCommentList> comment = new ArrayList<>();
+                if (BCLCommentList.size() == 0) {
+                    ll_view_allComment.setVisibility(View.GONE);
+                } else if (BCLCommentList.size() > 2) {
+                    ll_view_allComment.setVisibility(View.VISIBLE);
+                    for (int i = 0; i < 2; i++) {
+                        comment.add(BCLCommentList.get(i));
+                    }
+                } else {
+                    ll_view_allComment.setVisibility(View.VISIBLE);
+                    comment.addAll(BCLCommentList);
+                }
+                viewAllBCLCommentAdapter.doRefresh(comment);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.iv_mike:
+                    if (onItemClick != null)
+                        onItemClick.viewComments(getAdapterPosition());
+                    break;
+                case R.id.ll_view_Comment:
+                    if (onItemClick != null)
+                        onItemClick.viewComments(getAdapterPosition());
+                    break;
+                case R.id.tv_username:
+                    if (onItemClick != null)
+                        onItemClick.onClickUsername(getAdapterPosition());
+                    break;
+                case R.id.profile_image:
+                    if (onItemClick != null)
+                        onItemClick.onClickProfile(getAdapterPosition());
+                    break;
+                case R.id.tv_name:
+                    if (onItemClick != null)
+                        onItemClick.onNameClick(getAdapterPosition());
+                    break;
+                case R.id.btn_likes:
+                    if (onItemClick != null)
+                        onItemClick.onClickLike(breastCancerLegaciesLists.get(getAdapterPosition()), getAdapterPosition());
+                    break;
+                case R.id.iv_shared:
+                    if (onItemClick != null)
+                        onItemClick.onClickShare(getAdapterPosition());
+                    break;
+                case R.id.iv_option:
+                    if (onItemClick != null)
+                        onItemClick.onClickOption(getAdapterPosition());
+            }
+        }
+    }
+}

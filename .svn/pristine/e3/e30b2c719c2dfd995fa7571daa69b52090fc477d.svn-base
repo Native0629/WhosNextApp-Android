@@ -1,0 +1,220 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.widget.MediaController;
+import android.widget.Toast;
+import android.widget.VideoView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.loginregistration.ForgotPasswordActivity;
+import com.app.whosnextapp.loginregistration.LoginActivity;
+import com.app.whosnextapp.loginregistration.SplashActivity;
+import com.app.whosnextapp.model.GetAllPicturesModel;
+import com.app.whosnextapp.model.GetCustomerProfileModel;
+import com.app.whosnextapp.model.GetFollowersListModel;
+import com.app.whosnextapp.model.GetFollowingListModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class MyProfileActivity extends BaseAppCompatActivity {
+
+    @BindView(R.id.settitle)
+    AppCompatTextView settitle;
+    @BindView(R.id.tv_countpost)
+    AppCompatTextView tv_countpost;
+    @BindView(R.id.tv_username)
+    AppCompatTextView tv_username;
+    @BindView(R.id.tv_countfollowers)
+    AppCompatTextView tv_countfollowers;
+    @BindView(R.id.tv_countfollowing)
+    AppCompatTextView tv_countfollowing;
+    @BindView(R.id.tv_views)
+    AppCompatTextView tv_views;
+    @BindView(R.id.tv_about_self)
+    AppCompatTextView tv_about_self;
+    @BindView(R.id.tv_city)
+    AppCompatTextView tv_city;
+    @BindView(R.id.tv_category)
+    AppCompatTextView tv_category;
+    @BindView(R.id.checkbox)
+    AppCompatCheckBox checkbox;
+    @BindView(R.id.tv_editprofile)
+    AppCompatTextView tv_editprofile;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.videoView)
+    VideoView videoView;
+    Globals globals;
+    String firstname,lastname;
+
+    private Activity getActivity() {
+        return MyProfileActivity.this;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_my_profile);
+        ButterKnife.bind(this);
+        init();
+    }
+
+    public void init() {
+
+        toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.red));
+        setSupportActionBar(toolbar);
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        settitle.setText(Constants.WN_MYPROFILE);
+        setTitle("");
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setHomeAsUpIndicator(R.drawable.ic_menubar);
+
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawer.openDrawer(GravityCompat.START);
+            }
+        });
+        globals = (Globals) getApplicationContext();
+
+        countposts();
+        countfollowers();
+        countfollowering();
+        doRequestForGetMyProfile();
+    }
+
+    @OnClick(R.id.tv_editprofile)
+    public void onEditProfileClick() {
+        Intent intent = new Intent(MyProfileActivity.this, EditProfileActivity.class);
+        intent.putExtra(Constants.WN_FIRSTNAME,firstname);
+        intent.putExtra(Constants.WN_LASTNAME,lastname);
+        intent.putExtra(Constants.WN_USERNAME, globals.getUserDetails().getStatus().getUserName());
+        intent.putExtra(Constants.WN_USERID, globals.getUserDetails().getStatus().getUserId());
+        intent.putExtra(Constants.WN_EMAIL, globals.getUserDetails().getStatus().getEmail());
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.refresh, menu);
+        return true;
+    }
+
+    public void countposts() {
+        String UID = getIntent().getStringExtra(Constants.WN_USERID);
+        String requestURL = getString(R.string.get_all_pictures);
+
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetAllPicturesModel getAllPictures = new Gson().fromJson(response, GetAllPicturesModel.class);
+                if (getAllPictures != null) {
+                    tv_countpost.setText(String.valueOf(getAllPictures.getPostList().size()));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(MyProfileActivity.this, msg);
+            }
+        }).execute(UID);
+    }
+
+    public void countfollowers() {
+        String UID = getIntent().getStringExtra(Constants.WN_USERID);
+        final String requestURL = String.format(getString(R.string.get_followers_list), getIntent().getStringExtra(Constants.WN_CUSTOMERID));
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetFollowersListModel getFollowersList = new Gson().fromJson(response, GetFollowersListModel.class);
+                if (getFollowersList != null) {
+                    tv_countfollowers.setText(String.valueOf(getFollowersList.getCustomerList().size()));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(MyProfileActivity.this, msg);
+            }
+        }).execute(UID);
+    }
+
+    public void countfollowering() {
+       String UID = getIntent().getStringExtra(Constants.WN_USERID);
+
+        final String requestURL = String.format(getString(R.string.get_following_list), getIntent().getStringExtra(Constants.WN_CUSTOMERID));
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetFollowingListModel getFollowingList = new Gson().fromJson(response, GetFollowingListModel.class);
+                if (getFollowingList != null) {
+                    tv_countfollowing.setText(String.valueOf(getFollowingList.getCustomerList().size()));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(MyProfileActivity.this, msg);
+            }
+        }).execute(UID);
+    }
+
+
+    public void doRequestForGetMyProfile() {
+
+        String UID = getIntent().getStringExtra(Constants.WN_USERID);
+        final String requestURL = getString(R.string.get_customer_profile);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetCustomerProfileModel getCustomerProfileModel = new Gson().fromJson(response, GetCustomerProfileModel.class);
+                if (getCustomerProfileModel != null) {
+                    tv_views.setText(String.valueOf(getCustomerProfileModel.getCustomerDetail().getTotalViews()));
+                    tv_about_self.setText(String.valueOf(getCustomerProfileModel.getCustomerDetail().getAboutSelf()));
+                    tv_city.setText(String.valueOf(getCustomerProfileModel.getCustomerDetail().getCity()));
+                    tv_category.setText(String.valueOf(getCustomerProfileModel.getCustomerDetail().getCategoryNames()));
+                    checkbox.setChecked(Boolean.parseBoolean(String.valueOf(getCustomerProfileModel.getCustomerDetail().getIsPrivate())));
+                    videoView.setVideoURI(Uri.parse(getCustomerProfileModel.getCustomerDetail().getBioVideoUrl()));
+                    videoView.start();
+                    firstname=getCustomerProfileModel.getCustomerDetail().getFirstName();
+                    lastname=getCustomerProfileModel.getCustomerDetail().getLastName();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(MyProfileActivity.this, msg);
+            }
+        }).execute(UID);
+    }
+}

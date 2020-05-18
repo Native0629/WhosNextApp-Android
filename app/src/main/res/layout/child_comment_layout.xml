@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dim_10"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_size_18" />
+
+        <com.linkedin.android.spyglass.ui.MentionsEditText
+            android:id="@+id/tv_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:enabled="false"
+            android:fontFamily="@font/robotoregular"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="none"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_18"
+            app:mentionTextColor="@color/red"
+            app:selectedMentionTextColor="@color/red" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_comment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_18" />
+
+</LinearLayout>

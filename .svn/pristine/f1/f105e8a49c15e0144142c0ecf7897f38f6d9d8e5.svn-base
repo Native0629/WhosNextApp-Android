@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fl_notification"
+    android:layout_width="@dimen/notification_bell_dim_55"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_notification"
+        style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem.Shortcut"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingEnd="@dimen/notification_bell_dim_10"
+        android:paddingRight="@dimen/notification_bell_dim_10"
+        android:visibility="visible"
+        app:srcCompat="@drawable/bell"
+        tools:ignore="RtlSymmetry" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="@dimen/notification_bell_dim_10"
+        android:layout_marginEnd="@dimen/notification_bell_dim_10">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_noitfication_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:minWidth="@dimen/dim_15"
+            android:paddingLeft="@dimen/dim_5"
+            android:paddingTop="@dimen/dim_3"
+            android:paddingRight="@dimen/dim_5"
+            android:paddingBottom="@dimen/dim_3"
+            android:textSize="@dimen/notification_bell_text_size_8" />
+    </FrameLayout>
+
+
+</FrameLayout>

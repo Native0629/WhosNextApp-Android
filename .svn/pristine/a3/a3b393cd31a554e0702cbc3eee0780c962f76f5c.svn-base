@@ -1,0 +1,136 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.GetProfileByCustomerIdModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.gson.Gson;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class NotificationVideoActivity extends BaseAppCompatActivity implements View.OnClickListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.settitle)
+    AppCompatTextView settitle;
+    @BindView(R.id.exoplayer)
+    SimpleExoPlayerView player;
+
+    Globals globals;
+    Integer actionuserid;
+    String firstname;
+    Uri videoUri;
+    ExtractorsFactory extractorsFactory;
+    DataSource.Factory dataSourceFactory;
+    SimpleExoPlayer exoPlayer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notification_video);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        actionuserid = getIntent().getIntExtra(Constants.WN_ACTIONUSERID, 0);
+        doRequestToProfileVideoDetails();
+        setActionBar();
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.color.red);
+        setSupportActionBar(toolbar);
+        setTitle("");
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initializePlayer();
+    }
+
+    private void initializePlayer() {
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        player.setPlayer(exoPlayer);
+        dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "CloudinaryExoplayer"));
+        extractorsFactory = new DefaultExtractorsFactory();
+    }
+
+    private void doRequestToProfileVideoDetails() {
+        final String requestURL = String.format(getString(R.string.get_discover_people_by_customer_id_url), actionuserid);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetProfileByCustomerIdModel getProfileByCustomerIdModel = new Gson().fromJson(response, GetProfileByCustomerIdModel.class);
+                if (getProfileByCustomerIdModel != null) {
+                    videoUri = Uri.parse(getProfileByCustomerIdModel.getCustomerDetail().getBioVideoUrl());
+                    MediaSource videoSource = new ExtractorMediaSource(videoUri, dataSourceFactory, extractorsFactory,
+                            null, null);
+                    exoPlayer.prepare(videoSource);
+                    firstname = getProfileByCustomerIdModel.getCustomerDetail().getFirstName()
+                            + getProfileByCustomerIdModel.getCustomerDetail().getLastName();
+                    settitle.setText(firstname);
+                } else {
+                    Globals.showToast(getApplicationContext(), getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getApplicationContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer != null) {
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}
+
+

@@ -1,0 +1,185 @@
+package com.app.whosnextapp.drawer.homepage;
+
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.fragment.app.Fragment;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ProgressRequestBody;
+import com.app.whosnextapp.apis.ProgressUtil;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.bumptech.glide.Glide;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class EditFollowerFragment extends Fragment implements ProgressRequestBody.UploadCallbacks {
+
+    @BindView(R.id.iv_video_thumbnail)
+    AppCompatImageView iv_video_thumbnail;
+    @BindView(R.id.et_write_caption)
+    AppCompatEditText et_write_caption;
+    @BindView(R.id.btn_share)
+    AppCompatButton btn_share;
+    @BindView(R.id.ll_share_video_progress)
+    LinearLayout ll_share_video_progress;
+    @BindView(R.id.progress_uploading)
+    ProgressBar progress_uploading;
+    String PostId;
+    String isImage, isVideo;
+    private String selectedVideoPath;
+    private EditShareToActivity mContext;
+    private Globals globals;
+    private FFmpeg ffmpeg;
+    private ACProgressFlower dialog;
+
+    public static EditFollowerFragment newInstance() {
+        return new EditFollowerFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = (EditShareToActivity) context;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_edit_follower, container, false);
+        ButterKnife.bind(this, v);
+        globals = (Globals) mContext.getApplicationContext();
+        dialog = ProgressUtil.initProgressBar(getActivity());
+        ffmpeg = globals.loadFFMpegBinary(mContext);
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        progress_uploading.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+        ll_share_video_progress.setVisibility(View.GONE);
+        if (mContext.getIntent() != null) {
+            selectedVideoPath = mContext.getIntent().getStringExtra(Constants.WN_PICTURE_PATH);
+            Glide.with(mContext).load(selectedVideoPath).into(iv_video_thumbnail);
+            et_write_caption.setText(mContext.getIntent().getStringExtra(Constants.CAPTION));
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.home_page_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.header_bell).setVisible(true);
+        menu.findItem(R.id.header_search).setVisible(false);
+        menu.findItem(R.id.header_refresh).setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.header_bell) {
+            startActivity(new Intent(getActivity(), NotificationActivity.class));
+        }
+        return false;
+    }
+
+    @OnClick(R.id.btn_share)
+    public void btnShareClick() {
+        doRequestForEditPost();
+    }
+
+    private void doRequestForEditPost() {
+
+        PostId = mContext.getIntent().getStringExtra(Constants.WN_POST_ID);
+        isImage = String.valueOf(mContext.getIntent().getExtras().getInt(Constants.WN_IS_IMAGE));
+        isVideo = isImage.equals("0") ? "1" : "0";
+//        if (editShareToPictureActivity.getIntent().getExtras().getBoolean(Constants.WN_IS_IMAGE)) {
+//            isImage = "1";
+//            isVideo = "0";
+//        } else {
+//            isImage = "0";
+//            isVideo = "1";
+//        }
+
+        JSONObject postData = HttpRequestHandler.getInstance().editPostJson(PostId, "", isImage, et_write_caption.getText().toString(), "", "120.000000", "112.000000",
+                "", isVideo, "");
+
+        new PostRequest(getActivity(), postData, getString(R.string.edit_post), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel updateCustomerProfileModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (updateCustomerProfileModel != null) {
+                    if (updateCustomerProfileModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        Globals.showToast(getActivity(), getString(R.string.msg_update_profile));
+                        mContext.finish();
+
+                    } else {
+                        Globals.showToast(getActivity(), getString(R.string.msg_server_error));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+
+    @Override
+    public void onProgressUpdate(int percentage) {
+
+    }
+
+    @Override
+    public void onError() {
+
+    }
+
+    @Override
+    public void onFinish() {
+
+    }
+}

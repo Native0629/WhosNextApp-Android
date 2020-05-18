@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/first_name"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:paddingStart="@dimen/dim_5"
+                android:paddingLeft="@dimen/dim_5"
+                android:text="@string/last_name"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20"
+                tools:ignore="RtlSymmetry" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/username"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/email"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/city"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/city"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/website"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_WEBSITE1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/website_1"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@color/color_blue_accent"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_3"
+                android:background="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_WEBSITE2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/website_2"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@color/color_blue_accent"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_3"
+                android:background="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_WEBSITE3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/website_3"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@color/color_blue_accent"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_3"
+                android:background="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_WEBSITE4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/website_4"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@color/color_blue_accent"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <View
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_3"
+                android:background="@android:color/white" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/tv_WEBSITE5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/website_5"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:singleLine="true"
+                android:textColor="@color/color_blue_accent"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/category"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+
+            <FrameLayout
+                android:id="@+id/btn_select_talent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/light_gray"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40">
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/dim_5"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_18" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/dim_12"
+                    android:layout_height="@dimen/dim_12"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="@dimen/dim_10"
+                    android:layout_marginRight="@dimen/dim_10"
+                    app:srcCompat="@drawable/dropdown" />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/dim_40"
+                    android:padding="@dimen/dim_5"
+                    android:text="@string/introduction_bio_video"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_replace_video"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical|end"
+                    android:minHeight="@dimen/dim_40"
+                    android:padding="@dimen/dim_10"
+                    android:text="@string/replace_video"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_20" />
+
+            </LinearLayout>
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_upload_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/dim_300"
+                android:scaleType="centerCrop" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/about_self"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_150"
+                android:background="@color/light_gray"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/tv_about_self"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:hint="@string/describe_yourself_in_1_word"
+                    android:minHeight="@dimen/dim_40"
+                    android:padding="@dimen/dim_5"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@color/gray"
+                    android:textSize="@dimen/text_size_18" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dim_40"
+                android:background="@color/sky"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:minHeight="@dimen/dim_40"
+                android:text="@string/update"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:id="@+id/ll_share_video_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_uploading"
+                    android:textSize="@dimen/text_size_14" />
+
+                <ProgressBar
+                    android:id="@+id/progress_uploading"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_video_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_caption_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/dim_40"
+                android:padding="@dimen/dim_5"
+                android:text="@string/text_write_caption"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_write_caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="start"
+                android:hint="@string/text_write_caption"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:overScrollMode="always"
+                android:padding="@dimen/dim_10"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:scrollHorizontally="false"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+        </LinearLayout>
+
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/dim_40"
+        android:background="@color/sky"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:gravity="center"
+        android:text="@string/text_share"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_20" />
+</RelativeLayout>

@@ -1,0 +1,146 @@
+package com.app.whosnextapp.notification;
+
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.ConnectionDetector;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.GetProfileByCustomerIdModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.gson.Gson;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class ProfileVideoPlayerActivity extends BaseAppCompatActivity implements View.OnClickListener, Player.EventListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.exoplayer)
+    PlayerView player;
+
+    Globals globals;
+    Integer action_user_id;
+    Uri videoUri;
+    DataSource.Factory dataSourceFactory;
+    SimpleExoPlayer exoPlayer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notification_video);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        action_user_id = getIntent().getIntExtra(Constants.WN_CUSTOMER_ID, 0);
+        doRequestToProfileVideoDetails();
+        setActionBar();
+        initializePlayer();
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.color.red);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    private void initializePlayer() {
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        player.setPlayer(exoPlayer);
+        dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
+    }
+
+    private void doRequestToProfileVideoDetails() {
+        if (!ConnectionDetector.internetCheck(ProfileVideoPlayerActivity.this, false))
+            return;
+
+        final String requestURL = String.format(getString(R.string.get_discover_people_by_customer_id_url), action_user_id);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetProfileByCustomerIdModel getProfileByCustomerIdModel = new Gson().fromJson(response, GetProfileByCustomerIdModel.class);
+                if (getProfileByCustomerIdModel != null) {
+                    toolbar_title.setText(getProfileByCustomerIdModel.getCustomerDetail().getFirstName() + " " + getProfileByCustomerIdModel.getCustomerDetail().getLastName());
+                    videoUri = Uri.parse(getProfileByCustomerIdModel.getCustomerDetail().getBioVideoUrl());
+                    MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(videoUri);
+                    exoPlayer.prepare(videoSource);
+                    exoPlayer.setPlayWhenReady(true);
+                } else {
+                    Globals.showToast(getApplicationContext(), getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getApplicationContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.getPlaybackState();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (exoPlayer != null) {
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(true);
+            exoPlayer.getPlaybackState();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}
+
+

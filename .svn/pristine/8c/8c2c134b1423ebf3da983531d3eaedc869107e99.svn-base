@@ -1,0 +1,29 @@
+package com.app.whosnextapp.loginregistration;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+
+public class PrivacyPolicyActivity extends BaseAppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_privacy_policy);
+        init();
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void init() {
+        WebView wv = findViewById(R.id.wv_privacy_policy);
+        WebSettings webSettings = wv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        wv.loadUrl(getString(R.string.url_privacy_policy));
+    }
+}

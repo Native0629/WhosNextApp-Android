@@ -1,0 +1,276 @@
+package com.app.whosnextapp.settings;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.AdCommentListModel;
+import com.app.whosnextapp.model.GetAllAdsByCustomerIdModel;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.pictures.CommentActivity;
+import com.app.whosnextapp.pictures.LikePostActivity;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
+public class AdsActivity extends BaseAppCompatActivity implements AdsAdapter.OnItemClick, View.OnClickListener {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    Globals globals;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.rv_ads)
+    RecyclerView rv_ads;
+
+    AdsAdapter adsAdapter;
+    private ACProgressFlower dialog;
+    GetAllAdsByCustomerIdModel getAllAdsByCustomerIdModel;
+    private ArrayList<GetAllAdsByCustomerIdModel.AdsList> adsLists = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_ads);
+        ButterKnife.bind(this);
+        init();
+    }
+
+    private void init() {
+        globals = (Globals) getApplicationContext();
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar_title.setText(getString(R.string.text_ads));
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+        //doRequestForGetAllAds();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        doRequestForGetAllAds();
+    }
+
+    @OnClick(R.id.fab)
+    public void onFabClick() {
+        startActivity(new Intent(AdsActivity.this, CreateNewADActivity.class));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_page_menu, menu);
+        menu.findItem(R.id.header_bell).setVisible(true);
+        menu.findItem(R.id.header_refresh).setVisible(true);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.header_bell) {
+            startActivity(new Intent(this, NotificationActivity.class));
+        }
+        return false;
+    }
+
+    public void setAdsAdapter() {
+        if (adsAdapter == null) {
+            adsAdapter = new AdsAdapter(AdsActivity.this, this);
+        }
+        if (rv_ads.getAdapter() == null) {
+            rv_ads.setLayoutManager(new LinearLayoutManager(this));
+            rv_ads.setAdapter(adsAdapter);
+        }
+        adsAdapter.doRefresh(adsLists);
+    }
+
+    public void doRequestForGetAllAds() {
+        String requestURL = String.format(getString(R.string.get_all_ads_by_customer_ID), 1);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                getAllAdsByCustomerIdModel = new Gson().fromJson(response, GetAllAdsByCustomerIdModel.class);
+                if (getAllAdsByCustomerIdModel != null && getAllAdsByCustomerIdModel.getAdsLists() != null && !getAllAdsByCustomerIdModel.getAdsLists().isEmpty()) {
+                    adsLists.addAll(getAllAdsByCustomerIdModel.getAdsLists());
+                    setAdsAdapter();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(AdsActivity.this, msg);
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+
+    }
+
+    @Override
+    public void viewAllComments(GetAllAdsByCustomerIdModel.AdsList adsLists, final int position) {
+        final String requestURL = String.format(getString(R.string.get_all_comment_By_ADID), adsLists.getAdId(), "1");
+        new PostRequest(this, null, requestURL, false, false, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                AdCommentListModel adCommentListModel = new Gson().fromJson(response, AdCommentListModel.class);
+                if (adCommentListModel != null && adCommentListModel.getAdCommentList() != null && !adCommentListModel.getAdCommentList().isEmpty()) {
+                    adCommentListModel.getAdCommentList().get(position).setComment(adCommentListModel.getAdCommentList().get(position).getComment());
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(AdsActivity.this, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void likeDisplay(int i) {
+        Intent intent = new Intent(this, LikePostActivity.class);
+        intent.putExtra(Constants.WN_AD_ID, getAllAdsByCustomerIdModel.getAdsLists().get(i).getAdId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickLike(final int i) {
+        doRequestForLikeDisLikeAD(i);
+    }
+
+    private void doRequestForLikeDisLikeAD(final int i) {
+        final GetAllAdsByCustomerIdModel.AdsList ad = adsLists.get(i);
+        final String requestURL = String.format(getString(R.string.like_unlike_ad), ad.getAdId(), ad.getIsLiked() ? 0 : 1);
+
+        new PostRequest(this, null, requestURL, false, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        if (ad.getIsLiked()) {
+                            ad.setTotalLikes(ad.getTotalLikes() > 0 ? ad.getTotalLikes() - 1 : 0);
+                        } else {
+                            ad.setTotalLikes(ad.getTotalLikes() + 1);
+                        }
+                        ad.setIsLiked(!ad.getIsLiked());
+                        adsLists.set(i, ad);
+                        adsAdapter.setAdsLists(adsLists);
+                        adsAdapter.notifyItemChanged(i, ad.getTotalLikes());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(AdsActivity.this, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+
+    }
+
+    @Override
+    public void onClickAddComment(int i) {
+        Intent intent = new Intent(this, CommentActivity.class);
+        intent.putExtra(Constants.WN_AD_ID, getAllAdsByCustomerIdModel.getAdsLists().get(i).getAdId());
+        intent.putExtra(Constants.WN_CUSTOMER_ID, getAllAdsByCustomerIdModel.getAdsLists().get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickOptionMenu(final int i) {
+        CharSequence[] options = new CharSequence[]{getResources().getString(R.string.delete), getResources().getString(R.string.cancel)};
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(options, (dialog, item) -> {
+            switch (item) {
+                case 0:
+                    doRequestForAd(i);
+                    break;
+                case 1:
+                    dialog.dismiss();
+                    break;
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void doRequestForAdsPublish(int i) {
+        String requestURL = String.format(getString(R.string.publish_ads), getAllAdsByCustomerIdModel.getAdsLists().get(i).getAdId());
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    //todo
+                    if (!likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        Globals.showToast(AdsActivity.this, getResources().getString(R.string.publish_3_ads_in_month));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onClickButton(int i) {
+        Uri uri = Uri.parse(getAllAdsByCustomerIdModel.getAdsLists().get(i).getButtonLink());
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    public void doRequestForAd(int i) {
+        String requestURL = String.format(getString(R.string.delete_ad), getAllAdsByCustomerIdModel.getAdsLists().get(i).getAdId());
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        doRequestForGetAllAds();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}

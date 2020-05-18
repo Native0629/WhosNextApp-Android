@@ -1,0 +1,16 @@
+{
+  "app_id": "35136",
+  "auth_key": "qgUG3hnpebgtutj",
+  "auth_secret": "ykPKjHzz2r4faed",
+  "account_key": "bupHQ5yc5Mxph6r1QaPj",
+  "api_domain": "https://api.quickblox.com",
+  "chat_domain": "chat.quickblox.com",
+  "port": 5223,
+  "socket_timeout": 300,
+  "keep_alive": true,
+  "use_tls": true,
+  "auto_join": false,
+  "auto_mark_delivered": true,
+  "reconnection_allowed": true,
+  "allow_listen_network": true
+}

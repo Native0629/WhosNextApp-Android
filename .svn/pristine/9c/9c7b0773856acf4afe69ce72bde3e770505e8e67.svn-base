@@ -1,0 +1,335 @@
+package com.app.whosnextapp.utility;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.multidex.MultiDex;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.messaging.quickblox.configs.ConfigUtils;
+import com.app.whosnextapp.messaging.quickblox.configs.CoreApp;
+import com.app.whosnextapp.messaging.quickblox.model.SampleConfigs;
+import com.app.whosnextapp.model.CategoryModel;
+import com.app.whosnextapp.model.UserDetailModel;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.linkedin.android.spyglass.tokenization.impl.WordTokenizerConfig;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import im.ene.toro.exoplayer.Config;
+import im.ene.toro.exoplayer.MediaSourceBuilder;
+import im.ene.toro.exoplayer.ToroExo;
+
+public class Globals extends CoreApp {
+
+    public static ArrayList<CategoryModel.CategoryList> categoryLists = new ArrayList<>();
+    @SuppressLint("StaticFieldLeak")
+    static Context context;
+    private static SampleConfigs sampleConfigs;
+    public Config config;
+    SharedPreferences sp;
+    SharedPreferences.Editor editor;
+    private HttpProxyCacheServer proxy;
+    private FFmpeg ffmpeg;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static WordTokenizerConfig getTokenizerConfig(String word) {
+        return new WordTokenizerConfig
+                .Builder()
+                .setWordBreakChars(word)
+                .setExplicitChars(Constants.WN_MentionPrefix)
+                .setMaxNumKeywords(1)
+                .setThreshold(1)
+                .build();
+    }
+
+    public static SampleConfigs getSampleConfigs() {
+        return sampleConfigs;
+    }
+
+    public static void showToast(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static UserDetailModel toUserDetails(String params) {
+        if (params == null)
+            return null;
+
+        Type mapType = new TypeToken<UserDetailModel>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(params, mapType);
+    }
+
+    public static String toJsonString(UserDetailModel params) {
+        if (params == null) {
+            return null;
+        }
+        Type mapType = new TypeToken<UserDetailModel>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.toJson(params, mapType);
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        try {
+            InputMethodManager inputManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            assert inputManager != null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                inputManager.hideSoftInputFromWindow(Objects.requireNonNull(activity.getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            } else
+                inputManager.hideSoftInputFromWindow((activity.getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Animation for zoom in and zoom out toolbar title
+    public static void setAnimationToView(final TextView toView) {
+        final Animation zoomIn, zoomOut;
+        zoomIn = AnimationUtils.loadAnimation(context, R.anim.zoom_in);
+        zoomOut = AnimationUtils.loadAnimation(context, R.anim.zoom_out);
+        toView.setAnimation(zoomIn);
+        toView.setAnimation(zoomOut);
+
+        zoomIn.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation arg0) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation arg0) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                toView.startAnimation(zoomOut);
+            }
+        });
+
+        zoomOut.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation arg0) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation arg0) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                toView.startAnimation(zoomIn);
+
+            }
+        });
+    }
+
+    public static void hideAnimationToView(final TextView toView) {
+        toView.setAnimation(null);
+    }
+
+    /*Used for caching the video in feed post*/
+    public static HttpProxyCacheServer getProxy(Context context) {
+        Globals globals = (Globals) context.getApplicationContext();
+        return globals.proxy == null ? (globals.proxy = globals.newProxy()) : globals.proxy;
+    }
+
+    public static boolean isAppIsInBackground(Context context) {
+        boolean isInBackground = true;
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+            if (runningProcesses != null) {
+                for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                    if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                        for (String activeProcess : processInfo.pkgList) {
+                            if (activeProcess.equals(context.getPackageName())) {
+                                isInBackground = false;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+            if (taskInfo != null) {
+                ComponentName componentInfo = taskInfo.get(0).topActivity;
+                if (componentInfo.getPackageName().equals(context.getPackageName())) {
+                    isInBackground = false;
+                }
+            }
+        }
+
+        return isInBackground;
+    }
+
+    /**
+     * check that text contain only whitespace or not
+     *
+     * @param text text in which you want to check for space
+     * @return return true when no white space there else false
+     */
+    public static boolean isWhitespace(String text) {
+        if (text == null) {
+            return false;
+        }
+        int sz = text.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isWhitespace(text.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int dpFromPx(Context context, final float px) {
+        return (int) (px / context.getResources().getDisplayMetrics().density);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        config = ToroExo.with(this).getDefaultConfig().newBuilder()
+                .setMediaSourceBuilder(MediaSourceBuilder.LOOPING).build();
+        MultiDex.install(this);
+        initSampleConfigs();
+        context = getApplicationContext();
+        Logger.addLogAdapter(new AndroidLogAdapter() {
+            @Override
+            public boolean isLoggable(int priority, String tag) {
+                return true;
+            }
+        });
+    }
+
+    private void initSampleConfigs() {
+        try {
+            sampleConfigs = ConfigUtils.getSampleConfigs(Constants.WN_QB_CONFIG_FILE_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public SharedPreferences getSharedPref() {
+        return sp = (sp == null) ? getSharedPreferences(Constants.WN_secrets, Context.MODE_PRIVATE) : sp;
+    }
+
+    public SharedPreferences.Editor getEditor() {
+        return editor = (editor == null) ? getSharedPref().edit() : editor;
+    }
+
+    public void addCategory(String category) {
+        categoryLists.add(new CategoryModel.CategoryList(0, category, true));
+    }
+
+    public List<CategoryModel.CategoryList> getAllCategory() {
+        return categoryLists;
+    }
+
+    public UserDetailModel getUserDetails() {
+        return toUserDetails(getSharedPref().getString(Constants.WN_USER_MAP, null));
+    }
+
+    public void setUserDetails(UserDetailModel userMap) {
+        getEditor().putString(Constants.WN_USER_MAP, toJsonString(userMap));
+        getEditor().commit();
+    }
+
+    private HttpProxyCacheServer newProxy() {
+        return new HttpProxyCacheServer.Builder(this)
+                .maxCacheSize(Constants.WN_SIZE_1024 * Constants.WN_SIZE_1024 * Constants.WN_SIZE_1024)
+                .build();
+    }
+
+    public void show_dialog(Context context, String title, String desc, CharSequence[] options, boolean isCancelable,
+                            OptionDialogClickHanderListener optionDialogClickHanderListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+        builder.setTitle(title);
+        if (desc != null && !desc.isEmpty())
+            builder.setMessage(desc);
+        builder.setCancelable(isCancelable);
+        builder.setItems(options, optionDialogClickHanderListener::OnItemClick);
+        builder.show();
+    }
+
+    public FFmpeg loadFFMpegBinary(Activity activity) {
+        try {
+            if (ffmpeg == null) {
+                ffmpeg = FFmpeg.getInstance(activity);
+            }
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+                @Override
+                public void onFailure() {
+                    showUnsupportedExceptionDialog(activity);
+                }
+
+                @Override
+                public void onSuccess() {
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+            showUnsupportedExceptionDialog(activity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ffmpeg;
+    }
+
+    private void showUnsupportedExceptionDialog(Activity activity) {
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Not Supported")
+                .setMessage("Device Not Supported")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> activity.finish())
+                .create()
+                .show();
+    }
+
+    public String getFCM_DeviceToken() {
+        return getSharedPref().getString(Constants.WN_DEVICE_TOKEN, null);
+    }
+
+    public void setFCM_DeviceToken(String token) {
+        getEditor().putString(Constants.WN_DEVICE_TOKEN, token);
+        getEditor().commit();
+    }
+
+    public interface OptionDialogClickHanderListener {
+        void OnItemClick(DialogInterface dialog, int item);
+    }
+
+
+}

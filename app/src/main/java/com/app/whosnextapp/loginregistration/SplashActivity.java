@@ -1,0 +1,112 @@
+package com.app.whosnextapp.loginregistration;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.model.UserDetailModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+import com.orhanobut.logger.Logger;
+
+import org.json.JSONObject;
+
+public class SplashActivity extends BaseAppCompatActivity {
+    Handler handler;
+    Globals globals;
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            openNavigationActivity();
+        }
+    };
+
+    private Activity getActivity() {
+        return SplashActivity.this;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+        globals = (Globals) getApplicationContext();
+        Logger.e("FCM token: " + globals.getFCM_DeviceToken());
+    }
+
+    @Override
+    protected void onResume() {
+        performOperation();
+        super.onResume();
+    }
+
+    public void performOperation() {
+        if (globals != null && globals.getUserDetails() != null) {
+            doRequestForAutoLogin();
+        } else {
+            startHandler();
+        }
+    }
+
+    private void startHandler() {
+        handler = new Handler();
+        handler.postDelayed(runnable, Constants.WN_SPLASH_TIME);
+    }
+
+    public void doRequestForAutoLogin() {
+        if (globals.getUserDetails().getStatus().getPassword() == null || globals.getUserDetails().getStatus().getPassword().isEmpty()) {
+            globals.setUserDetails(null);
+            openNavigationActivity();
+        }
+
+        JSONObject postData = HttpRequestHandler.getInstance()
+                .getLoginJson(globals.getFCM_DeviceToken(), globals.getUserDetails().getStatus().getUserName(), Constants.WN_ANDROID,
+                        globals.getUserDetails().getStatus().getPassword());
+
+        new PostRequest(this, postData, getString(R.string.get_login_url), false, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                UserDetailModel userDetailModel = new Gson().fromJson(response, UserDetailModel.class);
+                if (userDetailModel != null) {
+                    if (userDetailModel.getStatus().getResult().equals(Constants.WN_SUCCESS)) {
+                        userDetailModel.getStatus().setPassword(globals.getUserDetails().getStatus().getPassword());
+                        globals.setUserDetails(userDetailModel);
+                        openNavigationActivity();
+                    }
+                } else {
+                    Globals.showToast(getActivity(), getString(R.string.err_username_password_in_correct));
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+            }
+        }).execute();
+
+    }
+
+    public void openNavigationActivity() {
+        if (globals.getUserDetails() == null) {
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+        } else {
+            Intent intent = new Intent(getActivity(), HomePageActivity.class);
+            intent.putExtra(Constants.WN_USERNAME, globals.getUserDetails().getStatus().getUserName());
+            intent.putExtra(Constants.WN_USER_ID, globals.getUserDetails().getStatus().getUserId());
+            intent.putExtra(Constants.WN_CUSTOMER_ID, globals.getUserDetails().getStatus().getCustomerId());
+            startActivity(intent);
+        }
+
+        finish();
+    }
+}
+

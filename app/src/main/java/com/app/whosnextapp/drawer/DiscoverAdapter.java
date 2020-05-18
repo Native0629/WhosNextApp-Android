@@ -1,0 +1,138 @@
+package com.app.whosnextapp.drawer;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.model.DiscoverModel;
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.CustomViewHolder> implements Filterable {
+    private Context context;
+    private ArrayList<DiscoverModel.CustomerList> discoverModels;
+    private ArrayList<DiscoverModel.CustomerList> mFilterDiscoveryModels;
+    private OnCustomClickListener onCustomClickListener;
+
+    DiscoverAdapter(Context context, OnCustomClickListener onCustomClickListener) {
+        this.context = context;
+        this.onCustomClickListener = onCustomClickListener;
+    }
+
+    void doRefresh(ArrayList<DiscoverModel.CustomerList> discoverModels) {
+        this.discoverModels = discoverModels;
+        this.mFilterDiscoveryModels = discoverModels;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public DiscoverAdapter.CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.discover_people_item, viewGroup, false);
+        return new DiscoverAdapter.CustomViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DiscoverAdapter.CustomViewHolder holder, int i) {
+        holder.setDataToView(mFilterDiscoveryModels.get(i), i);
+    }
+
+    ArrayList<DiscoverModel.CustomerList> getItems() {
+        return mFilterDiscoveryModels;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mFilterDiscoveryModels.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if (charString.isEmpty()) {
+                    mFilterDiscoveryModels = discoverModels;
+                } else {
+                    ArrayList<DiscoverModel.CustomerList> filteredList = new ArrayList<>();
+                    for (DiscoverModel.CustomerList row : discoverModels) {
+                        String full_name = row.getFirstName() + " " + row.getLastName();
+                        if (full_name.toLowerCase().contains(charString.toLowerCase()) ||
+                                row.getUserName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+                    mFilterDiscoveryModels = filteredList;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterDiscoveryModels;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mFilterDiscoveryModels = (ArrayList<DiscoverModel.CustomerList>) results.values;
+                onCustomClickListener.onFilter(mFilterDiscoveryModels != null);
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    public interface OnCustomClickListener {
+        void onClickProfile(int position, View v);
+
+        void onClickUsername(int position, View v);
+
+        void onFilter(boolean IsShow);
+    }
+
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.iv_profile_pic)
+        CircleImageView iv_profile_pic;
+        @BindView(R.id.tv_name)
+        TextView tv_name;
+        @BindView(R.id.tv_username)
+        TextView tv_username;
+
+        CustomViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+            iv_profile_pic.setOnClickListener(this);
+            tv_name.setOnClickListener(this);
+        }
+
+        void setDataToView(DiscoverModel.CustomerList customerList, int i) {
+            tv_name.setText(customerList.getFirstName() + " " + customerList.getLastName());
+            tv_username.setText(customerList.getUserName());
+            Glide.with(context)
+                    .load(customerList.getProfilePicUrl())
+                    .into(iv_profile_pic);
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.iv_profile_pic:
+                    onCustomClickListener.onClickProfile(getAdapterPosition(), v);
+                    break;
+                case R.id.tv_name:
+                    onCustomClickListener.onClickUsername(getAdapterPosition(), v);
+                    break;
+            }
+        }
+    }
+}

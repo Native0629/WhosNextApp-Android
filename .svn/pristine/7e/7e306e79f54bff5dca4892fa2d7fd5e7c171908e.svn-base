@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/fl_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dim_50"
+        android:background="@color/red">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/dim_10"
+            android:fontFamily="@font/aboxfor2"
+            android:text="@string/text_caption"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_30" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_margin="@dimen/dim_10"
+            android:fontFamily="@font/aboxfor2"
+            android:text="@string/done"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_30" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:gravity="start"
+        android:hint="@string/text_write_caption"
+        android:inputType="textMultiLine"
+        android:lines="6"
+        android:overScrollMode="always"
+        android:padding="@dimen/dim_10"
+        android:scrollbarStyle="insideInset"
+        android:scrollbars="vertical"
+        android:scrollHorizontally="false"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"
+        android:textSize="@dimen/text_size_18" />
+</LinearLayout>

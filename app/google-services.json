@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "267336268359",
+    "firebase_url": "https://who-s-next.firebaseio.com",
+    "project_id": "who-s-next",
+    "storage_bucket": "who-s-next.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267336268359:android:ac42794eba2f701e",
+        "android_client_info": {
+          "package_name": "com.app.whosnextapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "267336268359-slul4udlj9b1j6baa84i2pjve6ub5hh9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARKXetUAxLA4P_SPm8fg9fif4DauurQus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "267336268359-slul4udlj9b1j6baa84i2pjve6ub5hh9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

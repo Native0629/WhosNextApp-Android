@@ -1,0 +1,356 @@
+package com.app.whosnextapp.messaging;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.messaging.quickblox.helper.ChatHelper;
+import com.app.whosnextapp.pictures.SelectImageActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Utility;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.orhanobut.logger.Logger;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.content.QBContent;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.QBProgressCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static com.app.whosnextapp.messaging.quickblox.configs.CoreApp.TAG;
+
+public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
+    private static final int TYPE_OWN_TEXT = 1;
+    private static final int TYPE_OPPONENT_TEXT = 2;
+    private ArrayList<QBChatMessage> messages = new ArrayList<>();
+    private Context context;
+    private QBChatDialog qbChatDialog;
+
+    private HashMap<String, Drawable> drawableHashMap = new HashMap<>();
+    private String imageId;
+
+    ChatMessageAdapter(Context context, QBChatDialog qbChatDialog) {
+        this.context = context;
+        this.qbChatDialog = qbChatDialog;
+    }
+
+    void doRefreshSendMessage() {
+        notifyItemInserted(0);
+    }
+
+    void doRefresh(ArrayList<QBChatMessage> messages) {
+        this.messages = messages;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public ChatMessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        switch (viewType) {
+            case TYPE_OWN_TEXT:
+                return new ChatMessageViewHolder(LayoutInflater.from(context).inflate(R.layout.child_owner_message_layout, viewGroup, false));
+            case TYPE_OPPONENT_TEXT:
+                return new ChatMessageViewHolder(LayoutInflater.from(context).inflate(R.layout.child_opponent_message_layout, viewGroup, false));
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ChatMessageViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty()) {
+            if (payloads.get(0) instanceof Integer) {
+                if ((Integer) payloads.get(0) == 100) {
+                    hideProgressBar(holder);
+                } else {
+                    showProgress(holder);
+                }
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ChatMessageViewHolder holder, int i) {
+        QBChatMessage qbChatMessage = getItem(i);
+        holder.chat_message.setText(qbChatMessage.getBody());
+
+        holder.iv_chat_message_image.setOnClickListener(v -> {
+            if (qbChatMessage.getProperty(Constants.WN_Post_Id) != null && qbChatMessage.getProperty(Constants.WN_Username) != null
+                    && qbChatMessage.getProperty(Constants.WN_Post_Type).toString().equalsIgnoreCase("1")) {
+                context.startActivity(new Intent(context, SelectImageActivity.class)
+                        .putExtra(Constants.WN_POST_ID, qbChatMessage.getProperty(Constants.WN_Post_Id).toString()));
+            } else {
+                setAttachmentId(qbChatMessage);
+                if (new File(createFileName(imageId, qbChatMessage)).exists()) {
+                    context.startActivity(new Intent(context, OpenDownloadMediaActivity.class)
+                            .putExtra(Constants.WN_FILE_PATH, new File(createFileName(imageId, qbChatMessage)).getAbsolutePath())
+                            .putExtra(Constants.WN_HAS_IMAGE, qbChatMessage.getProperty(Constants.WN_HAS_IMAGE).toString()));
+                }
+            }
+        });
+
+        if (messages.get(i).getProperty(Constants.WN_HAS_MEDIA) != null && checkForAttachment(qbChatMessage)) {
+            setAttachmentId(qbChatMessage);
+            showAttachment(holder);
+            if (getItemViewType(i) == TYPE_OWN_TEXT) {
+                if (qbChatMessage.getProperty(Constants.WN_FILE_PATH) != null && new File(qbChatMessage.getProperty(Constants.WN_FILE_PATH).toString()).exists()) {
+                    showThumbnail(qbChatMessage, holder, qbChatMessage.getProperty(Constants.WN_FILE_PATH).toString());
+                } else if (new File(createFileName(imageId, qbChatMessage)).exists()) {
+                    showThumbnail(qbChatMessage, holder, createFileName(imageId, qbChatMessage));
+                } else {
+                    if (qbChatMessage.getProperty(Constants.WN_HAS_IMAGE) == "true") {
+                        downloadImageFromMessage(imageId, holder, true);
+                    } else {
+                        downloadImageFromMessage(imageId, holder, false);
+                    }
+                }
+            } else {
+                if (new File(createFileName(imageId, qbChatMessage)).exists()) {
+                    showThumbnail(qbChatMessage, holder, createFileName(imageId, qbChatMessage));
+                } else {
+                    if (qbChatMessage.getProperty(Constants.WN_HAS_IMAGE) == "true") {
+                        downloadImageFromMessage(imageId, holder, true);
+                    } else {
+                        downloadImageFromMessage(imageId, holder, false);
+                    }
+                }
+            }
+        } else {
+            showChatMessage(holder);
+        }
+        if (isIncoming(qbChatMessage) && !isRead(qbChatMessage)) {
+            readMessage(qbChatMessage);
+        }
+    }
+
+    private void downloadImageFromMessage(String imageId, ChatMessageViewHolder holder, boolean isImage) {
+        QBContent.downloadFileById(Integer.parseInt(imageId), new QBProgressCallback() {
+            @Override
+            public void onProgressUpdate(int i) {
+
+            }
+        }).performAsync(new QBEntityCallback<InputStream>() {
+            @Override
+            public void onSuccess(InputStream inputStream, Bundle bundle) {
+                if (inputStream != null) {
+                    new InputStreamToFileDownload(inputStream, imageId, isImage).execute();
+                }
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+
+            }
+        });
+    }
+
+    private String createFileName(String fileId, QBChatMessage qbChatMessage) {
+        if (qbChatMessage.getProperty(Constants.WN_HAS_IMAGE) == "true") {
+            return Utility.createFilePath(Constants.WN_IMAGE_FOLDER_PATH, fileId, Constants.WN_EXT_IMAGE_JPG);
+        } else {
+            return Utility.createFilePath(Constants.WN_VIDEO_FOLDER_PATH, fileId, Constants.WN_VIDEO_MP4);
+        }
+    }
+
+    private void showThumbnail(final QBChatMessage qbChatMessage, final ChatMessageViewHolder holder, String filepath) {
+        if (drawableHashMap.get(String.valueOf(qbChatMessage.getDateSent())) != null) {
+            holder.iv_chat_message_image.setImageDrawable(drawableHashMap.get(String.valueOf(qbChatMessage.getDateSent())));
+            if (qbChatMessage.getBody() == null || qbChatMessage.getBody().isEmpty() || qbChatMessage.getBody().equals("null")) {
+                holder.tv_caption_message.setVisibility(View.GONE);
+            } else {
+                holder.tv_caption_message.setVisibility(View.VISIBLE);
+                holder.tv_caption_message.setText(qbChatMessage.getBody());
+            }
+            if (qbChatMessage.getProperty(Constants.WN_CUSTOMER) != null) {
+                holder.tv_share.setVisibility(View.VISIBLE);
+                holder.tv_share.setText(String.format(context.getString(R.string.text_share_msg), qbChatMessage.getProperty(Constants.WN_CUSTOMER)));
+            } else {
+                holder.tv_share.setVisibility(View.GONE);
+            }
+            return;
+        }
+        Glide.with(context).load(filepath).apply(new RequestOptions().centerCrop().diskCacheStrategy(DiskCacheStrategy.RESOURCE)).into(new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                drawableHashMap.put(String.valueOf(qbChatMessage.getDateSent()), resource);
+                holder.iv_chat_message_image.setImageDrawable(resource);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                super.onLoadFailed(errorDrawable);
+            }
+        });
+        if (qbChatMessage.getBody() == null || qbChatMessage.getBody().isEmpty() || qbChatMessage.getBody().equals("null")) {
+            holder.tv_caption_message.setVisibility(View.GONE);
+        } else {
+            holder.tv_caption_message.setVisibility(View.VISIBLE);
+            holder.tv_caption_message.setText(qbChatMessage.getBody());
+        }
+        if (qbChatMessage.getProperty(Constants.WN_CUSTOMER) != null) {
+            holder.tv_share.setVisibility(View.VISIBLE);
+            holder.tv_share.setText(String.format(context.getString(R.string.text_share_msg), qbChatMessage.getProperty(Constants.WN_CUSTOMER)));
+        } else {
+            holder.tv_share.setVisibility(View.GONE);
+        }
+    }
+
+    private void setAttachmentId(QBChatMessage qbChatMessage) {
+        for (QBAttachment attachment : qbChatMessage.getAttachments()) {
+            imageId = attachment.getId();
+        }
+    }
+
+    private void showChatMessage(ChatMessageViewHolder holder) {
+        holder.rl_attachment.setVisibility(View.GONE);
+        holder.ll_chat.setVisibility(View.VISIBLE);
+    }
+
+    private void showAttachment(ChatMessageViewHolder holder) {
+        holder.rl_attachment.setVisibility(View.VISIBLE);
+        holder.ll_chat.setVisibility(View.GONE);
+    }
+
+    private Boolean checkForAttachment(QBChatMessage qbChatMessage) {
+        return qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty();
+    }
+
+    private boolean isIncoming(QBChatMessage chatMessage) {
+        QBUser currentUser = ChatHelper.getCurrentUser();
+        return chatMessage.getSenderId() != null && !chatMessage.getSenderId().equals(currentUser.getId());
+    }
+
+    public QBChatMessage getItem(int position) {
+        return messages.get(position);
+    }
+
+    private boolean isRead(QBChatMessage chatMessage) {
+        Integer currentUserId = ChatHelper.getCurrentUser().getId();
+        return !CollectionsUtil.isEmpty(chatMessage.getReadIds()) && chatMessage.getReadIds().contains(currentUserId);
+    }
+
+    private void readMessage(QBChatMessage chatMessage) {
+        try {
+            qbChatDialog.readMessage(chatMessage);
+        } catch (XMPPException | SmackException.NotConnectedException e) {
+            Logger.e(TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (messages.get(position).getSenderId().equals(ChatHelper.getCurrentUser().getId())) {
+            return TYPE_OWN_TEXT;
+        } else {
+            return TYPE_OPPONENT_TEXT;
+        }
+    }
+
+    private void showProgress(ChatMessageViewHolder holder) {
+        holder.progress_bar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar(ChatMessageViewHolder holder) {
+        holder.progress_bar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public int getItemCount() {
+        return messages.size();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    class InputStreamToFileDownload extends AsyncTask<InputStream, Void, Void> {
+        InputStream inputStream;
+        String imageId;
+        boolean isImage;
+
+        InputStreamToFileDownload(InputStream inputStream, String imageId, boolean isImage) {
+            this.inputStream = inputStream;
+            this.imageId = imageId;
+            this.isImage = isImage;
+        }
+
+        @Override
+        protected Void doInBackground(InputStream... inputStreams) {
+            try {
+                createInputStreamToFile(inputStream, imageId, isImage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private void createInputStreamToFile(InputStream in, String imageId, boolean isImage) {
+            try {
+                String fileName;
+                if (isImage) {
+                    fileName = Utility.createFile(Constants.WN_IMAGE_FOLDER_PATH, imageId, Constants.WN_EXT_IMAGE_JPG);
+                } else {
+                    fileName = Utility.createFile(Constants.WN_VIDEO_FOLDER_PATH, imageId, Constants.WN_VIDEO_MP4);
+                }
+
+                File file = new File(fileName);
+                if (!file.exists())
+                    file.createNewFile();
+                try (OutputStream output = new FileOutputStream(file)) {
+                    byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+                    output.flush();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            notifyDataSetChanged();
+        }
+    }
+}

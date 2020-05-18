@@ -1,0 +1,92 @@
+package com.app.whosnextapp.pictures;
+
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.model.DiscoverModel;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class TagPeopleAdapter extends RecyclerView.Adapter<TagPeopleAdapter.CustomViewHolder> {
+
+    private ArrayList<DiscoverModel.CustomerList> discoverModels;
+    private AdapterView.OnItemClickListener onItemClickListener;
+
+    void doRefresh(ArrayList<DiscoverModel.CustomerList> discoverModels) {
+        this.discoverModels = discoverModels;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public TagPeopleAdapter.CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View itemView = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.discover_people_item, viewGroup, false);
+        return new TagPeopleAdapter.CustomViewHolder(itemView, this);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TagPeopleAdapter.CustomViewHolder holder, int i) {
+        DiscoverModel.CustomerList customerList = discoverModels.get(i);
+        try {
+            holder.setDataToView(customerList, i);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return discoverModels.size();
+    }
+
+    private void onItemHolderClick(CustomViewHolder holder) {
+        if (onItemClickListener != null)
+            onItemClickListener.onItemClick(null, holder.itemView, holder.getAdapterPosition(), holder.getItemId());
+    }
+
+    void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.tv_name)
+        TextView tv_name;
+        @BindView(R.id.tv_username)
+        TextView tv_username;
+
+        private TagPeopleAdapter tagPeopleAdapter;
+
+        CustomViewHolder(@NonNull View itemView, final TagPeopleAdapter tagPeopleAdapter) {
+            super(itemView);
+            this.tagPeopleAdapter = tagPeopleAdapter;
+            ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        void setDataToView(DiscoverModel.CustomerList customerList, int i) {
+            itemView.setAlpha(0.7f);
+            itemView.setBackgroundColor(Color.BLACK);
+            tv_name.setTextColor(Color.WHITE);
+            tv_username.setTextColor(Color.WHITE);
+            tv_name.setText(customerList.getFirstName() + " " + customerList.getLastName());
+            tv_username.setText(customerList.getUserName());
+        }
+
+        @Override
+        public void onClick(View v) {
+            tagPeopleAdapter.onItemHolderClick(CustomViewHolder.this);
+        }
+    }
+}

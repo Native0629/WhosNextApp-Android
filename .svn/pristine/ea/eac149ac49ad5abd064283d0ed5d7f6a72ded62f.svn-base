@@ -1,0 +1,416 @@
+package com.app.whosnextapp.drawer;
+
+import android.content.Context;
+import android.media.MediaPlayer;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.groupvideo.GroupVideoAdapter;
+import com.app.whosnextapp.model.GetAllPostByCustomerIDModel;
+import com.app.whosnextapp.model.GroupVideoModel;
+import com.app.whosnextapp.model.PostCommentListModel;
+import com.app.whosnextapp.utility.Globals;
+import com.app.whosnextapp.utility.TimeUtils;
+import com.bumptech.glide.Glide;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.yqritc.scalablevideoview.ScalableType;
+import com.yqritc.scalablevideoview.ScalableVideoView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class TabFeedAdapter extends RecyclerView.Adapter<TabFeedAdapter.ViewHolder> {
+    private Context context;
+    private OnItemClick onItemClick;
+    private ArrayList<GetAllPostByCustomerIDModel.PostList> postLists;
+    private int count, total;
+    private ArrayList<String> videos;
+    Globals globals;
+
+    TabFeedAdapter(Context context, OnItemClick onItemClick) {
+        this.context = context;
+        this.onItemClick = onItemClick;
+        globals = (Globals) context.getApplicationContext();
+    }
+
+    public void doRefresh(ArrayList<GetAllPostByCustomerIDModel.PostList> postLists) {
+        this.postLists = postLists;
+        notifyDataSetChanged();
+    }
+
+    interface OnItemClick {
+        void onClickAddComment(int i);
+
+        void likeDisplay(int i);
+
+        void displayAllComments(int i);
+
+        void displayComment(int i);
+
+        void onClickLike(GetAllPostByCustomerIDModel.PostList postList, int i);
+
+        void onClickShareIcon();
+
+        void onClickOptionIcon();
+
+        void onClickUsername(int i);
+
+        void requestForView(GetAllPostByCustomerIDModel.PostList postList, int i);
+
+        void onClickProfile(int i);
+
+        void onClickSmallProfile(int i);
+
+        void onClickSmallUsername(int i);
+    }
+
+    @NonNull
+    @Override
+    public TabFeedAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.child_dashboard_list, viewGroup, false);
+        return new TabFeedAdapter.ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TabFeedAdapter.ViewHolder viewHolder, int i) {
+        try {
+            viewHolder.setDataToView(postLists.get(i), i);
+            viewHolder.setViewCommentAdapter(postLists.get(i).getPostCommentList());
+            viewHolder.setGroupVideoData(postLists.get(i).getGroupVideoList(), 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        try {
+            if (postLists.get(holder.getAdapterPosition()).getIsVideo()) {
+                holder.iv_feed_post.setVisibility(View.GONE);
+                holder.video_view.setVisibility(View.VISIBLE);
+                setVideo(holder);
+            } else {
+                holder.iv_feed_post.setVisibility(View.VISIBLE);
+                holder.video_view.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setVideo(final ViewHolder holder) throws IOException {
+        if (holder.video_view != null) {
+            holder.video_view.setMinimumHeight(postLists.get(holder.getAdapterPosition()).getPostHeight());
+            if (holder.video_view.getmMediaPlayer() == null) {
+                holder.video_view.iniMediaPlayer();
+            }
+            if (!holder.video_view.isPlaying()) {
+                HttpProxyCacheServer proxy = Globals.getProxy(context);
+                String proxyUrl = proxy.getProxyUrl(postLists.get(holder.getAdapterPosition()).getPostUrl());
+                holder.video_view.setDataSource(proxyUrl);
+                holder.video_view.setVolume(0, 0);
+                holder.video_view.setLooping(true);
+                holder.progressbar.setVisibility(View.VISIBLE);
+                holder.video_view.prepareAsync(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        if (!holder.video_view.isPlaying()) {
+                            holder.video_view.setScalableType(ScalableType.CENTER_CROP);
+                            holder.video_view.start();
+                            holder.progressbar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return postLists.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, GroupVideoAdapter.OnGroupVideoClickListener {
+        @BindView(R.id.tv_username)
+        AppCompatTextView tv_username;
+        @BindView(R.id.ll_group_video_users)
+        LinearLayout ll_group_video_users;
+        @BindView(R.id.tv_group_video)
+        AppCompatTextView tv_group_video;
+        @BindView(R.id.rv_group_video)
+        RecyclerView rv_group_video;
+        @BindView(R.id.ll_feed_bottom)
+        LinearLayout ll_feed_bottom;
+        @BindView(R.id.progressbar)
+        ProgressBar progressbar;
+        @BindView(R.id.tv_time)
+        AppCompatTextView tv_time;
+        @BindView(R.id.profile_image)
+        CircleImageView profile_image;
+        @BindView(R.id.tv_likeCount)
+        AppCompatTextView tv_likeCount;
+        @BindView(R.id.tv_total_view)
+        AppCompatTextView tv_total_view;
+        @BindView(R.id.btn_likes)
+        AppCompatCheckBox btn_likes;
+        @BindView(R.id.pro_image)
+        CircleImageView pro_image;
+        @BindView(R.id.tv_name)
+        AppCompatTextView tv_name;
+        @BindView(R.id.tv_addComment)
+        AppCompatTextView tv_add_comment;
+        @BindView(R.id.tv_likes)
+        AppCompatTextView tv_likes;
+        @BindView(R.id.tv_view_all_comments)
+        AppCompatTextView tv_view_all_comments;
+        @BindView(R.id.iv_mike)
+        AppCompatImageView iv_mike;
+        @BindView(R.id.iv_shared)
+        AppCompatImageView iv_shared;
+        @BindView(R.id.iv_option)
+        AppCompatImageView iv_option;
+        @BindView(R.id.rv_pictures)
+        RecyclerView rv_pictures;
+        @BindView(R.id.video_view)
+        ScalableVideoView video_view;
+        @BindView(R.id.Image_view)
+        ImageView iv_feed_post;
+
+        ViewCommentAdapter viewCommentAdapter;
+        GroupVideoAdapter groupVideoAdapter;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void setDataToView(GetAllPostByCustomerIDModel.PostList postList, int position) {
+            tv_username.setText(postList.getUserName());
+            Glide.with(context).load(postList.getProfilePicUrl()).into(profile_image);
+            tv_time.setText(TimeUtils.getTimeDiff(context, Long.parseLong(postList.getTimeDiff())));
+            if (postList.getIsImage()) {
+                Glide.with(context).load(postList.getPostUrl()).into(iv_feed_post);
+                iv_feed_post.setVisibility(View.VISIBLE);
+                video_view.setVisibility(View.GONE);
+            } else {
+                iv_feed_post.setVisibility(View.GONE);
+                video_view.setVisibility(View.VISIBLE);
+            }
+            if (postList.getIsGroupVideo()) {
+                tv_group_video.setVisibility(View.VISIBLE);
+                ll_group_video_users.setVisibility(View.VISIBLE);
+                ll_feed_bottom.setVisibility(View.GONE);
+                getURI();
+                playMultipleVideos(postList.getGroupVideoList(), 0);
+            } else {
+                tv_group_video.setVisibility(View.GONE);
+                ll_group_video_users.setVisibility(View.GONE);
+                ll_feed_bottom.setVisibility(View.VISIBLE);
+            }
+
+            tv_total_view.setText(String.format(context.getString(R.string.text_views), postList.getTotalViews()));
+            if (!postList.getPostCommentList().isEmpty()) {
+                tv_view_all_comments.setVisibility(View.VISIBLE);
+            } else {
+                tv_view_all_comments.setVisibility(View.GONE);
+            }
+
+            String s = postList.getUserName() + " " + postList.getCaption();
+            SpannableString ss1 = new SpannableString(s);
+            ss1.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.red)), 0, postList.getUserName().length(), 0);
+            tv_name.setText(ss1);
+
+            tv_likeCount.setText(String.valueOf(postList.getTotalLikes()));
+            btn_likes.setChecked(postList.getIsLiked());
+            Glide.with(context).load(postList.getProfilePicUrl()).into(pro_image);
+
+            tv_add_comment.setOnClickListener(this);
+            tv_likes.setOnClickListener(this);
+            btn_likes.setOnClickListener(this);
+            tv_view_all_comments.setOnClickListener(this);
+            iv_mike.setOnClickListener(this);
+            iv_shared.setOnClickListener(this);
+            iv_option.setOnClickListener(this);
+            tv_username.setOnClickListener(this);
+            profile_image.setOnClickListener(this);
+            pro_image.setOnClickListener(this);
+            tv_name.setOnClickListener(this);
+            onItemClick.requestForView(postLists.get(getAdapterPosition()), position);
+        }
+
+        void setViewCommentAdapter(ArrayList<PostCommentListModel.PostCommentList> posts) {
+            if (viewCommentAdapter == null) {
+                viewCommentAdapter = new ViewCommentAdapter(context);
+            }
+            if (rv_pictures.getAdapter() == null) {
+                rv_pictures.setHasFixedSize(false);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                rv_pictures.setLayoutManager(layoutManager);
+                rv_pictures.setAdapter(viewCommentAdapter);
+            }
+
+            if (posts != null) {
+                Collections.reverse(posts);
+                ArrayList<PostCommentListModel.PostCommentList> post = new ArrayList<>();
+
+                if (posts.size() > 2) {
+                    for (int i = 0; i < 2; i++) {
+                        post.add(posts.get(i));
+                    }
+                } else {
+                    post.addAll(posts);
+                }
+                viewCommentAdapter.doRefresh(post);
+            }
+        }
+
+        void setGroupVideoData(ArrayList<GroupVideoModel> groupVideoData, int index) {
+            groupVideoAdapter = new GroupVideoAdapter(context, this);
+            groupVideoAdapter.doRefresh(groupVideoData);
+            rv_group_video.setHasFixedSize(true);
+            rv_group_video.setNestedScrollingEnabled(false);
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 5);
+            rv_group_video.setLayoutManager(gridLayoutManager);
+            rv_group_video.setAdapter(groupVideoAdapter);
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.tv_addComment:
+                    if (onItemClick != null)
+                        onItemClick.onClickAddComment(getAdapterPosition());
+                    break;
+                case R.id.tv_likes:
+                    if (onItemClick != null)
+                        onItemClick.likeDisplay(getAdapterPosition());
+                    break;
+                case R.id.btn_likes:
+                    if (onItemClick != null)
+                        onItemClick.onClickLike(postLists.get(getAdapterPosition()), getAdapterPosition());
+                    break;
+                case R.id.tv_view_all_comments:
+                    if (onItemClick != null)
+                        onItemClick.displayAllComments(getAdapterPosition());
+                    break;
+                case R.id.iv_mike:
+                    if (onItemClick != null)
+                        onItemClick.displayComment(getAdapterPosition());
+                    break;
+                case R.id.iv_shared:
+                    if (onItemClick != null)
+                        onItemClick.onClickShareIcon();
+                    break;
+                case R.id.iv_option:
+                    if (onItemClick != null)
+                        onItemClick.onClickOptionIcon();
+                    break;
+                case R.id.tv_username:
+                    if (onItemClick != null)
+                        onItemClick.onClickUsername(getAdapterPosition());
+                    break;
+                case R.id.profile_image:
+                    onItemClick.onClickProfile(getAdapterPosition());
+                    break;
+                case R.id.pro_image:
+                    onItemClick.onClickSmallProfile(getAdapterPosition());
+                    break;
+                case R.id.tv_name:
+                    onItemClick.onClickSmallUsername(getAdapterPosition());
+                    break;
+            }
+        }
+
+        @Override
+        public void onUserVideoClick(int position, int customerId, int groupVideoId, String videoUrl) {
+            try {
+                playMultipleVideos(postLists.get(getAdapterPosition()).getGroupVideoList(), position);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        void getURI() {
+            videos = new ArrayList<>();
+            for (int i = 0; i < postLists.get(getAdapterPosition()).getGroupVideoList().size(); i++) {
+                videos.add(postLists.get(getAdapterPosition()).getGroupVideoList().get(i).getPostUrl());
+            }
+            total = postLists.get(getAdapterPosition()).getGroupVideoList().size();
+        }
+
+        void playMultipleVideos(final ArrayList<GroupVideoModel> groupVideoList, int index) {
+            count = index;
+            if (count < total) {
+                video_view.setMinimumHeight(groupVideoList.get(count).getPostHeight());
+                if (video_view.getmMediaPlayer() == null) {
+                    video_view.iniMediaPlayer();
+                }
+                try {
+                    video_view.setDataSource(videos.get(count));
+                    video_view.setVolume(0, 0);
+                    progressbar.setVisibility(View.VISIBLE);
+                    groupVideoList.get(count).isSelected = true;
+                    video_view.prepareAsync(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            if (!mp.isPlaying()) {
+                                groupVideoAdapter.doRefresh(groupVideoList);
+                                video_view.setScalableType(ScalableType.CENTER_CROP);
+                                video_view.start();
+                                progressbar.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+
+                    video_view.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            try {
+                                if (count < total - 1) {
+                                    groupVideoList.get(count).isSelected = false;
+                                    groupVideoAdapter.notifyItemChanged(count);
+                                    count++;
+                                    video_view.stop();
+                                    video_view.setDataSource(videos.get(count));
+                                    playMultipleVideos(postLists.get(getAdapterPosition()).getGroupVideoList(), count);
+                                } else if (count == total - 1) {
+                                    groupVideoAdapter.removeSelection();
+                                    count = 0;
+                                    groupVideoAdapter.notifyItemChanged(count);
+                                    video_view.stop();
+                                    video_view.setDataSource(videos.get(count));
+                                    playMultipleVideos(postLists.get(getAdapterPosition()).getGroupVideoList(), count);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}

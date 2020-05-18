@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".settings.GratitudeActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dim_20"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:gravity="center"
+        android:text="@string/thank_you"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_25" />
+
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_gretitude"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:gravity="start"
+        android:hint="@string/please_write_your_comment_here"
+        android:inputType="textMultiLine"
+        android:lines="6"
+        android:overScrollMode="always"
+        android:padding="@dimen/dim_5"
+        android:scrollbarStyle="insideInset"
+        android:scrollbars="vertical"
+        android:scrollHorizontally="false"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"
+        android:textSize="@dimen/text_size_18" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dim_40"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:gravity="center"
+        android:text="@string/amount"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_25" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:gravity="center"
+            android:text="@string/dollar"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_25" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_5"
+            android:background="@drawable/shape_edt_text"
+            android:gravity="center"
+            android:inputType="number"
+            android:minWidth="@dimen/dim_150"
+            android:minHeight="@dimen/dim_50"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dim_50"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shpe_submit_button"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:minWidth="@dimen/dim_125"
+            android:padding="@dimen/dim_10"
+            android:shadowColor="@android:color/transparent"
+            android:text="@string/submit"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_30"
+            android:background="@drawable/shape_subscribe"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:minWidth="@dimen/dim_125"
+            android:padding="@dimen/dim_10"
+            android:shadowColor="@android:color/transparent"
+            android:text="@string/cancel"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+    </LinearLayout>
+</LinearLayout>

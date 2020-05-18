@@ -1,0 +1,102 @@
+package com.app.whosnextapp.model;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class getCustomerInfoModel implements Serializable {
+
+    @SerializedName("Status")
+    private Status Status;
+
+    public Status getStatus() {
+        return Status;
+    }
+
+    public void setStatus(Status Status) {
+        this.Status = Status;
+    }
+
+    public static class Status {
+        @SerializedName("TotalPost")
+        private String TotalPost;
+        @SerializedName("TotalFollowings")
+        private String TotalFollowings;
+        @SerializedName("TotalFollowers")
+        private String TotalFollowers;
+        @SerializedName("Timer")
+        private int Timer;
+        @SerializedName("NotificationCount")
+        private String NotificationCount;
+        @SerializedName("IsSnippets")
+        private boolean IsSnippets;
+        @SerializedName("IsAdmin")
+        private boolean IsAdmin;
+        @SerializedName("CustomerId")
+        private String CustomerId;
+
+        public String getTotalPost() {
+            return TotalPost;
+        }
+
+        public void setTotalPost(String TotalPost) {
+            this.TotalPost = TotalPost;
+        }
+
+        public String getTotalFollowings() {
+            return TotalFollowings;
+        }
+
+        public void setTotalFollowings(String TotalFollowings) {
+            this.TotalFollowings = TotalFollowings;
+        }
+
+        public String getTotalFollowers() {
+            return TotalFollowers;
+        }
+
+        public void setTotalFollowers(String TotalFollowers) {
+            this.TotalFollowers = TotalFollowers;
+        }
+
+        public int getTimer() {
+            return Timer;
+        }
+
+        public void setTimer(int Timer) {
+            this.Timer = Timer;
+        }
+
+        public String getNotificationCount() {
+            return NotificationCount;
+        }
+
+        public void setNotificationCount(String NotificationCount) {
+            this.NotificationCount = NotificationCount;
+        }
+
+        public boolean getIsSnippets() {
+            return IsSnippets;
+        }
+
+        public void setIsSnippets(boolean IsSnippets) {
+            this.IsSnippets = IsSnippets;
+        }
+
+        public boolean getIsAdmin() {
+            return IsAdmin;
+        }
+
+        public void setIsAdmin(boolean IsAdmin) {
+            this.IsAdmin = IsAdmin;
+        }
+
+        public String getCustomerId() {
+            return CustomerId;
+        }
+
+        public void setCustomerId(String CustomerId) {
+            this.CustomerId = CustomerId;
+        }
+    }
+}

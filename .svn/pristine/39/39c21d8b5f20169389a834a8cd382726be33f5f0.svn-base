@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_snippet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".snippets.SnippetProfileActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/dim_5">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_profile"
+                    android:layout_width="@dimen/dim_40"
+                    android:layout_height="@dimen/dim_40"
+                    android:layout_gravity="center_vertical" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:layout_marginLeft="@dimen/dim_10"
+                    android:fontFamily="@font/aboxfor2"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20"
+                    tools:ignore="RtlHardcoded" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_snippet_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dim_10"
+                android:layout_marginLeft="@dimen/dim_10"
+                android:layout_marginEnd="@dimen/dim_10"
+                android:layout_marginRight="@dimen/dim_10"
+                android:minHeight="@dimen/dim_400"
+                android:scaleType="centerCrop" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_tap_to_play"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:padding="@dimen/dim_12"
+                android:text="@string/text_tap_on_image"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:gravity="center_vertical"
+                android:text="@string/text_snippets_details"
+                android:textAllCaps="true"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_snippet_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:hint="@string/text_no_snippet_detail"
+                android:lines="5"
+                android:textAllCaps="true"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

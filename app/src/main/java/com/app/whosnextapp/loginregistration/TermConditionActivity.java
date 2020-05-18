@@ -1,0 +1,57 @@
+package com.app.whosnextapp.loginregistration;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebView;
+
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class TermConditionActivity extends BaseAppCompatActivity implements View.OnClickListener {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.wv_term_condition)
+    WebView wv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_term_condition);
+        init();
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void init() {
+        ButterKnife.bind(this);
+        wv.getSettings().setJavaScriptEnabled(true);
+        setActionBar();
+        toolbar_title.setText(getIntent().getStringExtra(Constants.WN_POLICY));
+        wv.loadUrl(getIntent().getStringExtra(Constants.WN_TERMS_CONDITION));
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}

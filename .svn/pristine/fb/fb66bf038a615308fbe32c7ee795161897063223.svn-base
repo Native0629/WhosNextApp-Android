@@ -1,0 +1,108 @@
+package com.app.whosnextapp.groupvideo;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.model.GroupVideoModel;
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+//todo (Solved)
+public class GroupVideoAdapter extends RecyclerView.Adapter<GroupVideoAdapter.ViewHolder> {
+
+    private Context context;
+    private ArrayList<GroupVideoModel> groupVideoModels;
+    private OnGroupVideoClickListener clickListener;
+
+    public interface OnGroupVideoClickListener {
+        void onUserVideoClick(int position);
+    }
+
+    public GroupVideoAdapter(Context context, ArrayList<GroupVideoModel> groupVideoModels, OnGroupVideoClickListener clickListener) {
+        this.context = context;
+        this.groupVideoModels = groupVideoModels;
+        this.clickListener = clickListener;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_group_video_single, null);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position) {
+        viewHolder.setDataToView(groupVideoModels.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return groupVideoModels == null ? 0 : groupVideoModels.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        @BindView(R.id.iv_thumbnail)
+        AppCompatImageView iv_thumbnail;
+        @BindView(R.id.tv_group_video_username)
+        AppCompatTextView tv_group_video_username;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+            iv_thumbnail.setOnClickListener(this);
+
+        }
+
+        void setDataToView(GroupVideoModel groupVideoModel) {
+            Glide.with(context).load(groupVideoModel.getVideoThumbnailUrl()).into(iv_thumbnail);
+            tv_group_video_username.setText(groupVideoModel.getCustomerName());
+
+            if (groupVideoModel.isSelected) {
+                iv_thumbnail.setPadding(10, 10, 10, 10);
+                iv_thumbnail.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_video_frame));
+            } else {
+                iv_thumbnail.setPadding(0, 0, 0, 0);
+                iv_thumbnail.setBackground(null);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.iv_thumbnail:
+                    makeSelection(getAdapterPosition());
+                    clickListener.onUserVideoClick(getAdapterPosition());
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @param adapterPosition Make selection on selected position item and remove existing selection
+     */
+    private void makeSelection(int adapterPosition) {
+        for (int i = 0; i < groupVideoModels.size(); i++) {
+            if (groupVideoModels.get(i).isSelected) {
+                groupVideoModels.get(i).isSelected = false;
+                notifyItemChanged(i);
+            }
+        }
+        groupVideoModels.get(adapterPosition).isSelected = true;
+        notifyItemChanged(adapterPosition);
+    }
+
+}

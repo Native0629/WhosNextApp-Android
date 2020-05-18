@@ -1,0 +1,411 @@
+package com.app.whosnextapp.drawer;
+
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ProgressUtil;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.breastCancerLegacies.BreastCancerLegaciesFragment;
+import com.app.whosnextapp.drawer.homepage.MyFeedFragment;
+import com.app.whosnextapp.featuredProfile.FeaturedProfileFragment;
+import com.app.whosnextapp.loginregistration.LoginActivity;
+import com.app.whosnextapp.messaging.MessageFragment;
+import com.app.whosnextapp.messaging.quickblox.helper.ChatHelper;
+import com.app.whosnextapp.messaging.quickblox.utils.ConstantEnum;
+import com.app.whosnextapp.messaging.quickblox.utils.QbDialogHolder;
+import com.app.whosnextapp.model.GetCustomerInfoModel;
+import com.app.whosnextapp.navigationmenu.FollowerActivity;
+import com.app.whosnextapp.navigationmenu.FollowingActivity;
+import com.app.whosnextapp.pictures.PicturesFragment;
+import com.app.whosnextapp.settings.SettingFragment;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
+import com.quickblox.chat.model.QBChatDialog;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
+public class HomePageActivity extends BaseAppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DrawerMenuAdapter.MenuAdapterListener, ChatHelper.OnQBChatServicesListener {
+    @BindView(R.id.tv_username)
+    AppCompatTextView tv_username;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.rv_pictures)
+    RecyclerView recyclerView;
+    @BindView(R.id.tv_count_post)
+    AppCompatTextView tv_count_post;
+    @BindView(R.id.tv_count_followers)
+    AppCompatTextView tv_count_followers;
+    @BindView(R.id.tv_count_following)
+    AppCompatTextView tv_count_following;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
+    DrawerMenuAdapter drawerMenuAdapter;
+    Globals globals;
+    boolean isLoaderRequire = true;
+    ChatHelper.OnQBChatServicesListener onQBChatServicesListener;
+    ACProgressFlower acProgressFlower;
+    boolean doubleBackToExitPressedOnce = true;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home_page);
+        init();
+    }
+
+
+    public void init() {
+        ButterKnife.bind(this);
+        acProgressFlower = ProgressUtil.initProgressBar(this);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MyFeedFragment()).commit();
+        setAdapter();
+        globals = (Globals) getApplicationContext();
+        setActionbar(toolbar);
+        onQBChatServicesListener = this;
+        if (globals.getUserDetails() != null) {
+            if (new ArrayList<>(QbDialogHolder.getInstance().getDialogs(true).values()).isEmpty()) {
+                acProgressFlower.show();
+                ChatHelper.getInstance().init(this, null, ConstantEnum.QuickBloxDialogType.all, true, onQBChatServicesListener, true);
+            }
+        }
+    }
+
+    public void setActionbar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        toolbar_title.setText(R.string.text_who_s_next_app);
+        Globals.setAnimationToView(toolbar_title);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        toolbar_title.setGravity(Gravity.CENTER);
+        setDrawer();
+    }
+
+    public void setDrawer() {
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setHomeAsUpIndicator(R.drawable.ic_menubar);
+        toggle.setToolbarNavigationClickListener(view -> drawer.openDrawer(GravityCompat.START));
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    public void setInnerDrawerLayout(Toolbar toolbar) {
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        toolbar.setBackgroundResource(R.color.red);
+        toolbar_title.setText(R.string.text_my_profile);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        Globals.hideAnimationToView(toolbar_title);
+        setDrawer();
+    }
+
+    public void setPictureLayout(Toolbar toolbar) {
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        toolbar_title.setText(R.string.pictures);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setDrawer();
+    }
+
+    public void setPictureLayoutForVideos(Toolbar toolbar) {
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(R.string.text_videos);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setDrawer();
+    }
+
+    public void setBreastCancerLegacies(Toolbar toolbar) {
+        toolbar.setBackgroundResource(R.color.pink);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(getString(R.string.breast_cancer_legacies));
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.ribbon_selected_white), null);
+        toolbar_title.setCompoundDrawablePadding(20);
+        setDrawer();
+    }
+
+    public void setFeaturedProfile(Toolbar toolbar) {
+        toolbar.setBackgroundResource(R.color.sky);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(Constants.WN_FEATURED_PROFILE);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        toolbar_title.setCompoundDrawablePadding(20);
+        setDrawer();
+    }
+
+    public void setSettingLayout(Toolbar toolbar) {
+        tv_username.setText(getIntent().getStringExtra(Constants.WN_USERNAME));
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(R.string.action_settings);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setDrawer();
+    }
+
+    public void setDiscoverLayout(Toolbar toolbar) {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(R.string.discover_people);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setDrawer();
+    }
+
+    public void setMessageLayout(Toolbar toolbar) {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        Globals.hideAnimationToView(toolbar_title);
+        toolbar_title.setText(R.string.text_messages);
+        toolbar_title.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        setDrawer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        countPostsFollowerFollowing();
+        isLoaderRequire = false;
+    }
+
+    public void countPostsFollowerFollowing() {
+        String requestURL = getString(R.string.get_CustomerInfo);
+        new PostRequest(this, null, requestURL, isLoaderRequire, isLoaderRequire, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetCustomerInfoModel CustomerInfoModel = new Gson().fromJson(response, GetCustomerInfoModel.class);
+                if (CustomerInfoModel != null) {
+                    tv_count_post.setText(String.valueOf(CustomerInfoModel.getStatus().getTotalPost()));
+                    tv_count_followers.setText(String.valueOf(CustomerInfoModel.getStatus().getTotalFollowers()));
+                    tv_count_following.setText(String.valueOf(CustomerInfoModel.getStatus().getTotalFollowings()));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(HomePageActivity.this, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @OnClick(R.id.ll_followers)
+    public void onFollowerClick() {
+        Intent intent = new Intent(this, FollowerActivity.class);
+        intent.putExtra(Constants.WN_USER_ID, globals.getUserDetails().getStatus().getUserId());
+        startActivity(intent);
+        //closeDrawer();
+    }
+
+    @OnClick(R.id.ll_followings)
+    public void onFollowingClick() {
+        Intent intent = new Intent(this, FollowingActivity.class);
+        intent.putExtra(Constants.WN_USER_ID, globals.getUserDetails().getStatus().getUserId());
+        startActivity(intent);
+       // closeDrawer();
+    }
+
+    @OnClick(R.id.ll_Posts)
+    public void onPostClick() {
+        Intent intent = new Intent(this, HeaderAllPostActivity.class);
+        startActivity(intent);
+     //   closeDrawer();
+    }
+
+    public void setAdapter() {
+        if (recyclerView.getAdapter() == null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(HomePageActivity.this));
+            drawerMenuAdapter = new DrawerMenuAdapter(HomePageActivity.this, this);
+            recyclerView.setAdapter(drawerMenuAdapter);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            if (doubleBackToExitPressedOnce) {
+                this.doubleBackToExitPressedOnce = false;
+                Globals.showToast(this, getString(R.string.msg_press_back_exit));
+            } else {
+                finish();
+            }
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void closeDrawer() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    public void menuItemOnClick(View v, int position) {
+        if (drawerMenuAdapter != null) {
+            toolbar.setVisibility(View.VISIBLE);
+            switch (drawerMenuAdapter.getItem(position)) {
+
+                case Constants.WN_FEATURED_PROFILE:
+                    setFeaturedProfile(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new FeaturedProfileFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_BREAST_CANCER_LEGACIES:
+                    setBreastCancerLegacies(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new BreastCancerLegaciesFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_HOME_PAGE:
+                    setActionbar(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MyFeedFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_MESSAGING:
+                    setMessageLayout(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MessageFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_MY_PROFILE:
+                    setInnerDrawerLayout(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MyProfileFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_PICTURES:
+                    setPictureLayout(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new PicturesFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_VIDEOS:
+                    setPictureLayoutForVideos(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new VideosFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_DISCOVER:
+                    setDiscoverLayout(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new DiscoverFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_CHANGE_PASSWORD:
+                    toolbar.setVisibility(View.GONE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new ChangePasswordFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_SETTING:
+                    setSettingLayout(toolbar);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new SettingFragment()).commit();
+                    closeDrawer();
+                    break;
+
+                case Constants.WN_LOGOUT:
+                    showDialog();
+                    break;
+            }
+        }
+    }
+
+    public void showDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(getResources().getString(R.string.are_you_sure_want_to_logout));
+        alertDialogBuilder.setPositiveButton(getResources().getString(R.string.yes),
+                (arg0, arg1) -> {
+                    globals.setUserDetails(null);
+                    ChatHelper.getInstance().logoutFromChat(getApplication());
+                    startActivity(new Intent(HomePageActivity.this, LoginActivity.class));
+                    finishAffinity();
+                });
+
+        alertDialogBuilder.setNegativeButton(getResources().getString(R.string.no), (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent == null) {
+            return;
+        }
+        if (intent.hasExtra(Constants.WN_START_FRAGMENT) &&
+                intent.getStringExtra(Constants.WN_START_FRAGMENT).equalsIgnoreCase(Constants.WN_MY_PROFILE)) {
+            closeDrawer();
+            setInnerDrawerLayout(toolbar);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MyProfileFragment()).commit();
+        }
+        if (intent.hasExtra(Constants.WN_START_FRAGMENT) &&
+                intent.getStringExtra(Constants.WN_START_FRAGMENT).equalsIgnoreCase(Constants.WN_VIDEOS)) {
+            setPictureLayoutForVideos(toolbar);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new VideosFragment()).commit();
+        }
+        if (intent.hasExtra(Constants.WN_START_FRAGMENT) &&
+                intent.getStringExtra(Constants.WN_START_FRAGMENT).equalsIgnoreCase(Constants.WN_BREAST_CANCER_LEGACIES)) {
+            setBreastCancerLegacies(toolbar);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new BreastCancerLegaciesFragment()).commit();
+        }
+        if (intent.hasExtra(Constants.WN_START_FRAGMENT) &&
+                intent.getStringExtra(Constants.WN_START_FRAGMENT).equalsIgnoreCase(Constants.WN_MESSAGING)) {
+            setMessageLayout(toolbar);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragContent, new MessageFragment()).commit();
+        }
+    }
+
+    @Override
+    public void onServiceProcessSuccess(ArrayList<QBChatDialog> qbChatDialogs) {
+        acProgressFlower.dismiss();
+    }
+
+    @Override
+    public void onServiceProcessFailed(String errorMessage) {
+        acProgressFlower.dismiss();
+        Globals.showToast(this, errorMessage);
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+}

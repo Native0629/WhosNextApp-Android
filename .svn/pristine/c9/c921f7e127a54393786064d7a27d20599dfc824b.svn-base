@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/banner_reg"
+        android:minHeight="@dimen/dim_160"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:paddingStart="@dimen/dim_10"
+            android:paddingLeft="@dimen/dim_10"
+            android:paddingTop="@dimen/dim_10"
+            app:srcCompat="@drawable/backarrow"
+            tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="@dimen/dim_55"
+            android:layout_height="@dimen/dim_55"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="@dimen/dim_40"
+            app:srcCompat="@drawable/logo" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:padding="@dimen/dim_10"
+            android:text="@string/what_your_talent"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/dim_60"
+            android:paddingTop="@dimen/dim_35"
+            android:paddingRight="@dimen/dim_60"
+            android:paddingBottom="@dimen/dim_35">
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/first_name"
+                android:inputType="textCapWords"
+                android:padding="@dimen/dim_15"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/last_name"
+                android:inputType="textCapWords"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/username"
+                android:inputType="textCapWords"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_confirm_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/confirm_email"
+                android:inputType="textEmailAddress"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <com.cielyang.android.clearableedittext.ClearableEditText
+                android:id="@+id/et_confirm_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/confirm_password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textSize="@dimen/text_size_16"
+                app:clearIconDrawWhenFocused="false"
+                app:clearIconDrawable="@drawable/close_textfield" />
+
+            <FrameLayout
+                android:id="@+id/btn_select_talent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_2">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dim_5"
+                    android:background="@drawable/shaperact"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center"
+                    android:padding="@dimen/dim_15"
+                    android:singleLine="true"
+                    android:text="@string/select_talent"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_size_16" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/dim_12"
+                    android:layout_height="@dimen/dim_12"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginEnd="@dimen/dim_10"
+                    android:layout_marginRight="@dimen/dim_10"
+                    app:srcCompat="@drawable/dropdown"
+                    tools:ignore="RtlHardcoded" />
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_upload_video"
+                android:layout_width="@dimen/dim_50"
+                android:layout_height="@dimen/dim_50"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/videoupload" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_text_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:text="@string/text_video"
+                android:textSize="@dimen/text_size_14" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:gravity="center_horizontal">
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/chk_term_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:text="@null" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_terms_condition"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dim_5"
+                    android:layout_marginLeft="@dimen/dim_5"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textSize="@dimen/text_size_14"
+                    android:textStyle="normal"
+                    tools:ignore="RtlHardcoded"
+                    tools:text="@string/text_terms_conditions_privacy_policy" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:text="@string/register"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_18" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

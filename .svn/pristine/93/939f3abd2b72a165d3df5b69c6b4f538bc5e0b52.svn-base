@@ -1,0 +1,256 @@
+package com.app.whosnextapp.featuredProfile;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.GetFeaturesProfileModel;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.navigationmenu.OtherUserProfileActivity;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.notification.ProfileVideoPlayerActivity;
+import com.app.whosnextapp.pictures.CommentActivity;
+import com.app.whosnextapp.pictures.LikePostActivity;
+import com.app.whosnextapp.utility.BaseFragment;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import im.ene.toro.widget.Container;
+import im.ene.toro.widget.PressablePlayerSelector;
+
+public class FeaturedProfileFragment extends BaseFragment implements FeaturedProfileAdapter.OnItemClick {
+    @BindView(R.id.player_container)
+    Container container;
+    @BindView(R.id.tv_no_feed_found)
+    AppCompatTextView tv_no_feed_found;
+
+    PressablePlayerSelector selector;
+    Globals globals;
+    FeaturedProfileAdapter featuredProfileAdapter;
+    GetFeaturesProfileModel getFeaturesProfileModel;
+    boolean isLoaderRequire = true;
+    int likeCount, IsLike;
+    private ArrayList<GetFeaturesProfileModel.DashboardList> dashboardLists;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_featured_profile, container, false);
+        ButterKnife.bind(this, v);
+        setHasOptionsMenu(true);
+        init();
+        return v;
+    }
+
+    private void init() {
+        if (getActivity() != null) {
+            globals = (Globals) getActivity().getApplicationContext();
+            if (getFeaturesProfileModel == null) {
+                tv_no_feed_found.setVisibility(View.VISIBLE);
+            } else {
+                tv_no_feed_found.setVisibility(View.GONE);
+                doRequestForFeaturedProfileData();
+            }
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.home_page_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.header_bell).setVisible(true);
+        menu.findItem(R.id.header_search).setVisible(true);
+        menu.findItem(R.id.header_refresh).setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.header_bell:
+                startActivity(new Intent(getActivity(), NotificationActivity.class));
+                break;
+            case R.id.header_search:
+                Globals.showToast(getActivity(), getResources().getString(R.string.text_coming_soon));
+                break;
+            case R.id.header_refresh:
+                doRequestForFeaturedProfileData();
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getFeaturesProfileModel == null) {
+            tv_no_feed_found.setVisibility(View.VISIBLE);
+        } else {
+            tv_no_feed_found.setVisibility(View.GONE);
+            doRequestForFeaturedProfileData();
+            isLoaderRequire = false;
+        }
+    }
+
+    private void doRequestForFeaturedProfileData() {
+        String requestURL = String.format(getString(R.string.get_featured_profile), 1);
+        new PostRequest(getActivity(), null, requestURL, isLoaderRequire, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                getFeaturesProfileModel = new Gson().fromJson(response, GetFeaturesProfileModel.class);
+                if (getFeaturesProfileModel != null && getFeaturesProfileModel.getDashboardList() != null
+                        && !getFeaturesProfileModel.getDashboardList().isEmpty()) {
+                    dashboardLists = getFeaturesProfileModel.getDashboardList();
+                    setFeaturedProfileData();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getActivity(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void setFeaturedProfileData() {
+        if (featuredProfileAdapter == null && getContext() != null) {
+            selector = new PressablePlayerSelector(container);
+            featuredProfileAdapter = new FeaturedProfileAdapter(getContext(), this, selector);
+        }
+        if (container.getAdapter() == null) {
+            container.setHasFixedSize(false);
+            container.setLayoutManager(new LinearLayoutManager(getActivity()));
+            container.setPlayerSelector(selector);
+            container.setAdapter(featuredProfileAdapter);
+        }
+        featuredProfileAdapter.doRefresh(dashboardLists);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void likeDisplay(int i) {
+        Intent intent = new Intent(getContext(), LikePostActivity.class);
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardLists.get(i).getId()));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickAddComment(int i) {
+        navigateToComment(i);
+    }
+
+    @Override
+    public void displayAllComments(int i) {
+        navigateToComment(i);
+    }
+
+    @Override
+    public void displayComment(int i) {
+        navigateToComment(i);
+    }
+
+    public void navigateToComment(int i) {
+        Intent intent = new Intent(getContext(), CommentActivity.class);
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardLists.get(i).getId()));
+        intent.putExtra(Constants.WN_POST_TYPE, Constants.WN_POST_TYPE_Featured_Profile);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardLists.get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLikeButtonClick(GetFeaturesProfileModel.DashboardList dashboardLists, int i) {
+        likeCount = dashboardLists.getTotalLikes();
+        if (dashboardLists.getIsLiked() && likeCount != 0) {
+            likeCount = likeCount - 1;
+            IsLike = 0;
+        } else {
+            likeCount = likeCount + 1;
+            IsLike = 1;
+        }
+        String requestURL = String.format(getString(R.string.like_unlike_post), String.valueOf(dashboardLists.getId()), IsLike);
+        new PostRequest(getActivity(), null, requestURL, false, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        dashboardLists.setTotalLikes(likeCount);
+                        dashboardLists.setIsLiked(IsLike == 1);
+                        featuredProfileAdapter.notifyItemChanged(i, dashboardLists);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+
+    @Override
+    public void onClickShareIcon() {
+        Globals.showToast(getContext(), getResources().getString(R.string.text_coming_soon));
+    }
+
+    @Override
+    public void onClickOptionIcon() {
+        Globals.showToast(getContext(), getResources().getString(R.string.text_coming_soon));
+    }
+
+    @Override
+    public void onClickUsername(int i) {
+        navigateToProfile(i);
+    }
+
+    @Override
+    public void onClickProfile(int i) {
+        navigateToProfile(i);
+    }
+
+    @Override
+    public void onClickSmallProfile(int i) {
+        navigateToProfileVideo(i);
+    }
+
+    @Override
+    public void onClickSmallUsername(int i) {
+        navigateToProfileVideo(i);
+    }
+
+    private void navigateToProfile(int i) {
+        Intent intent = new Intent(getContext(), OtherUserProfileActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardLists.get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    private void navigateToProfileVideo(int i) {
+        Intent intent = new Intent(getContext(), ProfileVideoPlayerActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardLists.get(i).getCustomerId());
+        startActivity(intent);
+    }
+}

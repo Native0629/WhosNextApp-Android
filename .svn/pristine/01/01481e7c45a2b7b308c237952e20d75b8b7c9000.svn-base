@@ -1,0 +1,124 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.TextView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.model.DiscoverModel;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class DiscoverAdapter extends RecyclerView.Adapter<DiscoverAdapter.CustomViewHolder> implements Filterable {
+    private Context context;
+    private List<DiscoverModel.CustomerList> discoverModels;
+    private List<DiscoverModel.CustomerList> mFilterdiscoveryModels;
+    private DiscoverAdapter.OnFilterApplyListener listener;
+
+    DiscoverAdapter(Context context, DiscoverAdapter.OnFilterApplyListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
+
+    void doReferesh(List<DiscoverModel.CustomerList> discoverModels) {
+        this.discoverModels = discoverModels;
+        this.mFilterdiscoveryModels = discoverModels;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public DiscoverAdapter.CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View itemView = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.discover_people_item, viewGroup, false);
+        return new DiscoverAdapter.CustomViewHolder(itemView, this);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DiscoverAdapter.CustomViewHolder holder, int i) {
+        DiscoverModel.CustomerList customerList = mFilterdiscoveryModels.get(i);
+        try {
+            holder.setDataToView(customerList, i);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mFilterdiscoveryModels.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if (charString.isEmpty()) {
+                    mFilterdiscoveryModels = discoverModels;
+                } else {
+                    List<DiscoverModel.CustomerList> filteredList = new ArrayList<>();
+                    for (DiscoverModel.CustomerList row : discoverModels) {
+                        if (row.getUserName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+                    mFilterdiscoveryModels = filteredList;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterdiscoveryModels;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mFilterdiscoveryModels = (List<DiscoverModel.CustomerList>) results.values;
+                listener.onFilter(mFilterdiscoveryModels != null);
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    public interface OnFilterApplyListener {
+        void onFilter(boolean IsShow);
+    }
+
+    class CustomViewHolder extends RecyclerView.ViewHolder {
+        CircleImageView iv_profile_pic;
+        @BindView(R.id.tv_name)
+        TextView tv_name;
+        @BindView(R.id.tv_username)
+        TextView tv_username;
+        private DiscoverAdapter mdataset;
+
+        CustomViewHolder(@NonNull View itemView, final DiscoverAdapter mdataset) {
+            super(itemView);
+            this.mdataset = mdataset;
+            iv_profile_pic = itemView.findViewById(R.id.iv_profile_pic);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void setDataToView(DiscoverModel.CustomerList customerList, int i) throws Exception {
+            tv_name.setText(customerList.getFirstName() + " " + customerList.getLastName());
+            tv_username.setText(customerList.getUserName());
+            Glide.with(context)
+                    .load(customerList.getProfilePicUrl())
+                    .apply(RequestOptions.placeholderOf(R.drawable.usericon))
+                    .into(iv_profile_pic);
+        }
+    }
+}

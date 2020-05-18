@@ -1,0 +1,127 @@
+package com.app.whosnextapp.messaging;
+
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.TouchImageView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+
+import java.io.File;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class OpenDownloadMediaActivity extends BaseAppCompatActivity {
+
+    @BindView(R.id.iv_message_image)
+    TouchImageView iv_message_image;
+    @BindView(R.id.iv_close)
+    AppCompatImageView iv_close;
+    @BindView(R.id.exoplayer)
+    PlayerView player;
+    @BindView(R.id.ll_image)
+    LinearLayout ll_image;
+
+    SimpleExoPlayer exoPlayer;
+    DataSource.Factory dataSourceFactory;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_open_download_media);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getStringExtra(Constants.WN_HAS_IMAGE).equalsIgnoreCase("true")) {
+                ll_image.setVisibility(View.VISIBLE);
+                iv_close.setVisibility(View.VISIBLE);
+                player.setVisibility(View.GONE);
+                Glide.with(this).load(getIntent().getStringExtra(Constants.WN_FILE_PATH)).into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        iv_message_image.setImageDrawable(resource);
+                    }
+                });
+            } else {
+                player.setVisibility(View.VISIBLE);
+                ll_image.setVisibility(View.GONE);
+                iv_close.setVisibility(View.GONE);
+                initializePlayer();
+            }
+        }
+    }
+
+    private void initializePlayer() {
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        player.setPlayer(exoPlayer);
+        dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
+
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.fromFile(new File(getIntent().getStringExtra(Constants.WN_FILE_PATH))));
+        exoPlayer.prepare(videoSource);
+        exoPlayer.setPlayWhenReady(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.getPlaybackState();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (exoPlayer != null) {
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(true);
+            exoPlayer.getPlaybackState();
+        }
+    }
+
+    @OnClick(R.id.iv_close)
+    public void onCloseClick() {
+        finish();
+    }
+}

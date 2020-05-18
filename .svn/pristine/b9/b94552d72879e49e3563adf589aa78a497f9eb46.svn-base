@@ -1,0 +1,10 @@
+package com.app.whosnextapp.videocall;
+
+
+public interface OnCallEventsController {
+
+
+    void onUseHeadSet(boolean use);
+
+
+}

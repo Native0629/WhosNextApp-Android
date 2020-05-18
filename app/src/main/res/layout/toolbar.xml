@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:minWidth="?attr/actionBarSize"
+    android:minHeight="?attr/actionBarSize"
+    app:contentInsetEnd="0dp"
+    app:contentInsetLeft="0dp"
+    app:contentInsetRight="0dp"
+    app:contentInsetStart="0dp"
+    app:contentInsetStartWithNavigation="0dp"
+    app:layout_collapseMode="pin"
+    app:title="">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_27" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_flower"
+        android:layout_width="@dimen/dim_28"
+        android:layout_height="@dimen/dim_20"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/dim_70"
+        android:layout_marginLeft="@dimen/dim_80"
+        android:layout_marginTop="@dimen/dim_32"
+        android:scaleType="centerCrop"
+        android:src="@drawable/flower"
+        android:visibility="gone"
+        tools:ignore="RtlHardcoded" />
+</androidx.appcompat.widget.Toolbar>

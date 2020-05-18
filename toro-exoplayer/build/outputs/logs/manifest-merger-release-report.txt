@@ -1,0 +1,37 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+	package
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:11-42
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+	android:versionCode
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml:17:1-45
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+uses-sdk
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		ADDED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml
+		INJECTED from E:\C_Work\WhosNextApp\toro-exoplayer\src\main\AndroidManifest.xml

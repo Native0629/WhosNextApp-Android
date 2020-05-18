@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_uploadImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dim_1"
+        android:adjustViewBounds="true"
+        android:minWidth="@dimen/dim_140"
+        android:minHeight="@dimen/dim_140"
+        android:scaleType="centerCrop" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_volume"
+        android:layout_width="@dimen/dim_25"
+        android:layout_height="@dimen/dim_25"
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/dim_3"
+        android:scaleType="centerCrop"
+        android:src="@drawable/voiceon" />
+</FrameLayout>

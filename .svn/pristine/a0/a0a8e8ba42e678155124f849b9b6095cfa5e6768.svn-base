@@ -1,0 +1,386 @@
+package com.app.whosnextapp.drawer.homepage;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.drawer.ViewCommentAdapter;
+import com.app.whosnextapp.model.GetAllDashboardData;
+import com.app.whosnextapp.model.PostCommentListModel;
+import com.app.whosnextapp.utility.Globals;
+import com.app.whosnextapp.utility.TimeUtils;
+import com.bumptech.glide.Glide;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.google.android.exoplayer2.ui.PlayerView;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+import im.ene.toro.ToroPlayer;
+import im.ene.toro.ToroUtil;
+import im.ene.toro.exoplayer.ExoPlayerDispatcher;
+import im.ene.toro.exoplayer.ExoPlayerViewHelper;
+import im.ene.toro.helper.ToroPlayerHelper;
+import im.ene.toro.media.PlaybackInfo;
+import im.ene.toro.widget.Container;
+import im.ene.toro.widget.PressablePlayerSelector;
+
+public class ExoPlayerViewHolder extends RecyclerView.ViewHolder implements ToroPlayer, ToroPlayer.EventListener, View.OnClickListener {
+    /*TopBar*/
+    @BindView(R.id.profile_image)
+    CircleImageView profile_image;
+    @BindView(R.id.tv_username)
+    AppCompatTextView tv_username;
+    @BindView(R.id.tv_time)
+    AppCompatTextView tv_time;
+    /*BottomLine*/
+    @BindView(R.id.btn_likes)
+    AppCompatCheckBox btn_likes;
+    @BindView(R.id.tv_likeCount)
+    AppCompatTextView tv_likeCount;
+    @BindView(R.id.tv_total_view)
+    AppCompatTextView tv_total_view;
+    @BindView(R.id.iv_mike)
+    AppCompatImageView iv_mike;
+    @BindView(R.id.iv_shared)
+    AppCompatImageView iv_shared;
+    @BindView(R.id.iv_option)
+    AppCompatImageView iv_option;
+    @BindView(R.id.tv_likes)
+    AppCompatTextView tv_likes;
+    /*Username & Caption*/
+    @BindView(R.id.pro_image)
+    CircleImageView pro_image;
+    @BindView(R.id.tv_name)
+    AppCompatTextView tv_name;
+    /*Comments*/
+    @BindView(R.id.rv_comment)
+    RecyclerView rv_comment;
+    @BindView(R.id.tv_view_all_comments)
+    AppCompatTextView tv_view_all_comments;
+    @BindView(R.id.tv_addComment)
+    AppCompatTextView tv_addComment;
+    @BindView(R.id.iv_video_thumbnail)
+    AppCompatImageView iv_video_thumbnail;
+    @BindView(R.id.cl_home_feed)
+    LinearLayout cl_home_feed;
+    @BindView(R.id.fl_view)
+    FrameLayout fl_view;
+    @BindView(R.id.player)
+    PlayerView playerView;
+    @BindView(R.id.iv_volume)
+    AppCompatImageView iv_volume;
+
+
+    private Context context;
+    private Activity activity;
+    private ExoPlayerAdapter.OnItemClick onItemClick;
+    private GetAllDashboardData.DashboardList dashboardSingleData;
+    private ViewCommentAdapter viewCommentAdapter;
+    private ToroPlayerHelper toroPlayerHelper;
+    private Uri mediaUri;
+
+
+    private int video_width;
+    private int video_height;
+    Runnable mRunnable;
+    Handler mHandler;
+
+
+
+    ExoPlayerViewHolder(Activity activity, Context context, View itemView, PressablePlayerSelector selector, ExoPlayerAdapter.OnItemClick onItemClick) {
+        super(itemView);
+        this.onItemClick = onItemClick;
+        ButterKnife.bind(this, itemView);
+        this.context = context;
+        this.activity = activity;
+        if (selector != null) {
+            playerView.setControlDispatcher(new ExoPlayerDispatcher(selector, this));
+            playerView.removeView(iv_video_thumbnail);
+            playerView.getOverlayFrameLayout().addView(iv_video_thumbnail);
+        }
+        mHandler = new Handler();
+
+        mRunnable = () -> {
+            iv_volume.setVisibility(View.GONE); //This will remove the View. and free s the space occupied by the View
+        };
+    }
+
+    @NonNull
+    @Override
+    public View getPlayerView() {
+        return playerView;
+    }
+
+    @NonNull
+    @Override
+    public PlaybackInfo getCurrentPlaybackInfo() {
+        return toroPlayerHelper != null ? toroPlayerHelper.getLatestPlaybackInfo() : new PlaybackInfo();
+    }
+
+    @Override
+    public void initialize(@NonNull Container container, @NonNull PlaybackInfo playbackInfo) {
+        if (toroPlayerHelper == null) {
+            toroPlayerHelper = new ExoPlayerViewHelper(this, mediaUri, new ArrayList<Uri>());
+            toroPlayerHelper.addPlayerEventListener(this);
+
+
+        }
+        toroPlayerHelper.initialize(container, playbackInfo);
+    }
+
+    @Override
+    public void play() {
+        if (toroPlayerHelper != null) toroPlayerHelper.play();
+
+
+    }
+
+    @Override
+    public void pause() {
+        if (toroPlayerHelper != null) toroPlayerHelper.pause();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return toroPlayerHelper != null && toroPlayerHelper.isPlaying();
+    }
+
+    @Override
+    public void release() {
+        if (toroPlayerHelper != null) {
+            toroPlayerHelper.removePlayerEventListener(this);
+            toroPlayerHelper.release();
+            toroPlayerHelper = null;
+        }
+    }
+
+    @Override
+    public boolean wantsToPlay() {
+        return ToroUtil.visibleAreaOffset(this, itemView.getParent()) >= 0.85;
+    }
+
+    @Override
+    public int getPlayerOrder() {
+        return getAdapterPosition();
+    }
+
+    @Override
+    public String toString() {
+        return "ExoPlayer{" + hashCode() + " " + getAdapterPosition() + "}";
+    }
+
+    @Override
+    public void onFirstFrameRendered() {
+        iv_video_thumbnail.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBuffering() {
+
+    }
+
+    @Override
+    public void onPlaying() {
+        iv_video_thumbnail.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPaused() {
+        iv_video_thumbnail.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCompleted() {
+    }
+
+    public void bind(GetAllDashboardData.DashboardList dashboardList) {
+        dashboardSingleData = dashboardList;
+        if (dashboardList.getPostUrl() != null) {
+            //HttpProxyCacheServer proxy = Globals.getProxy(context);
+//            String proxyUrl = proxy.getProxyUrl(dashboardList.getPostUrl());
+            this.mediaUri = Uri.parse(dashboardList.getPostUrl());
+        } else {
+            this.mediaUri = Uri.parse("");
+        }
+
+        if (dashboardList.getCommentList() != null) {
+            if (dashboardList.getCommentList().isEmpty()) {
+                tv_view_all_comments.setVisibility(View.GONE);
+            } else {
+                tv_view_all_comments.setVisibility(View.VISIBLE);
+            }
+        }
+
+        this.video_height = dashboardList.getPostHeight();
+        this.video_width = dashboardList.getPostWidth();
+
+        setItemVideoHeight();
+
+        Glide.with(context).load(dashboardList.getProfilePicUrl()).into(profile_image);
+        tv_username.setText(dashboardList.getUserName());
+        tv_time.setText(TimeUtils.getTimeDiff(context, Long.parseLong(dashboardList.getTimeDiff())));
+
+        /*Video Thumbnail*/
+        //Glide.with(context).load(dashboardList.getVideoThumbnailUrl()).into(iv_video_thumbnail);
+        btn_likes.setChecked(dashboardList.getIsLiked());
+        tv_likeCount.setText(String.valueOf(dashboardList.getTotalLikes()));
+        tv_total_view.setText(String.format(context.getString(R.string.text_views), dashboardList.getTotalViews()));
+        Glide.with(context).load(dashboardList.getProfilePicUrl()).into(pro_image);
+
+
+        // String s = dashboardList.getUserName() + " " + dashboardList.getCaption();
+        String s = dashboardList.getUserName() + " " + StringEscapeUtils.unescapeJava(dashboardList.getCaption());
+
+        //  CharSequence processed =);
+        SpannableString ss1 = new SpannableString(s);
+        ss1.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.red)), 0, dashboardList.getUserName().length(), 0);
+        tv_name.setText(ss1);
+        //  setCommentData(dashboardList.getCommentList());
+
+        /*Click Listeners*/
+        profile_image.setOnClickListener(this);
+        tv_username.setOnClickListener(this);
+        btn_likes.setOnClickListener(this);
+        iv_mike.setOnClickListener(this);
+        iv_shared.setOnClickListener(this);
+        iv_option.setOnClickListener(this);
+        tv_likes.setOnClickListener(this);
+        tv_view_all_comments.setOnClickListener(this);
+        tv_addComment.setOnClickListener(this);
+        pro_image.setOnClickListener(this);
+        tv_name.setOnClickListener(this);
+        fl_view.setOnClickListener(this);
+    }
+
+    private void setCommentData(ArrayList<PostCommentListModel.PostCommentList> commentData) {
+        if (viewCommentAdapter == null) {
+            viewCommentAdapter = new ViewCommentAdapter(context);
+        }
+        if (commentData != null) {
+            // Collections.reverse(commentData);
+            ArrayList<PostCommentListModel.PostCommentList> post = new ArrayList<>();
+
+            if (commentData.size() > 2) {
+                for (int i = 0; i < 2; i++) {
+                    post.add(commentData.get(i));
+                }
+            } else {
+                post.addAll(commentData);
+            }
+            if (rv_comment.getAdapter() == null) {
+                rv_comment.setHasFixedSize(false);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                rv_comment.setLayoutManager(layoutManager);
+                rv_comment.setAdapter(viewCommentAdapter);
+            }
+            viewCommentAdapter.doRefresh(post);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.profile_image:
+                if (onItemClick != null)
+                    onItemClick.onClickProfile(getAdapterPosition() - 1);
+                break;
+            case R.id.tv_username:
+                if (onItemClick != null)
+                    onItemClick.onClickUsername(getAdapterPosition() - 1);
+                break;
+            case R.id.btn_likes:
+                if (onItemClick != null)
+                    onItemClick.onClickLike(dashboardSingleData, getAdapterPosition() - 1);
+                break;
+            case R.id.iv_mike:
+                if (onItemClick != null)
+                    onItemClick.displayComment(getAdapterPosition() - 1);
+                break;
+            case R.id.iv_shared:
+                if (onItemClick != null)
+                    onItemClick.onClickShareIcon(getAdapterPosition() - 1);
+                break;
+            case R.id.iv_option:
+                if (onItemClick != null)
+                    onItemClick.onClickOptionIcon(getAdapterPosition() - 1);
+                break;
+            case R.id.tv_likes:
+                if (onItemClick != null)
+                    onItemClick.likeDisplay(getAdapterPosition() - 1);
+                break;
+            case R.id.tv_view_all_comments:
+                if (onItemClick != null)
+                    onItemClick.displayAllComments(getAdapterPosition() - 1);
+                break;
+            case R.id.tv_addComment:
+                if (onItemClick != null)
+                    onItemClick.onClickAddComment(getAdapterPosition() - 1);
+                break;
+            case R.id.tv_name:
+                if (onItemClick != null)
+                    onItemClick.onClickSmallUsername(getAdapterPosition() - 1);
+                break;
+            case R.id.pro_image:
+                if (onItemClick != null)
+                    onItemClick.onClickSmallProfile(getAdapterPosition() - 1);
+                break;
+            case R.id.fl_view:
+                if (onItemClick != null)
+                    if (toroPlayerHelper.getVolume() == 0f) {
+                        toroPlayerHelper.setVolume(1f);
+                        iv_volume.setImageResource(R.drawable.volume_unmute);
+                        iv_volume.setVisibility(View.VISIBLE);
+                        mHandler.removeCallbacks(mRunnable);
+                        mHandler.postDelayed(mRunnable, 1000);
+                    } else {
+                        toroPlayerHelper.setVolume(0f);
+                        iv_volume.setImageResource(R.drawable.volume_mute);
+                        iv_volume.setVisibility(View.VISIBLE);
+                        mHandler.removeCallbacks(mRunnable);
+                        mHandler.postDelayed(mRunnable, 1000);
+                    }
+                break;
+        }
+    }
+
+//    private void setItemVideoHeight() {
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int width = displayMetrics.widthPixels;
+//         int req_height = ((video_height * width) / video_width);
+//        fl_view.setLayoutParams(new LinearLayout.LayoutParams(width, req_height));
+//    }
+
+
+    // Set Video Height and width
+    private void setItemVideoHeight() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        int req_height = ((video_height * width) / video_width);
+        fl_view.setLayoutParams(new LinearLayout.LayoutParams(width, req_height));
+    }
+
+}

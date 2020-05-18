@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:overScrollMode="always">
+
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_search_header"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/light_gray"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/edittext_search_rounded"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/sp_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dim_5"
+                    android:spinnerMode="dialog" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_5"
+                    android:layout_marginLeft="@dimen/dim_5"
+                    android:layout_marginEnd="@dimen/dim_5"
+                    android:layout_marginBottom="@dimen/dim_5"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_search_rounded"
+                    android:orientation="horizontal"
+                    tools:ignore="RtlHardcoded">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/dim_30"
+                        android:layout_height="@dimen/dim_30"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="@dimen/dim_5"
+                        app:srcCompat="@drawable/search_talent" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/et_search_people"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/search"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end|center"
+                    android:layout_marginEnd="@dimen/dim_10"
+                    android:layout_marginRight="@dimen/dim_10"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="RtlHardcoded">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_cancel_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:text="@string/cancel"
+                        android:textColor="@android:color/holo_blue_dark"
+                        android:textSize="@dimen/text_size_15"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_10"
+                android:fontFamily="@font/blowbrush"
+                android:gravity="center_horizontal"
+                android:text="@string/text_snippets"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_20" />
+
+            <com.joker.pager.BannerPager
+                android:id="@+id/banner_snippet"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_180" />
+
+            <im.ene.toro.widget.Container
+                android:id="@+id/player_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/dim_10"
+                android:nestedScrollingEnabled="false"
+                android:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_feed_not_found"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:text="@string/feeds_not_found"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_18"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

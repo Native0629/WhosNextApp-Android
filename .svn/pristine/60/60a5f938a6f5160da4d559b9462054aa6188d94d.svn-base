@@ -1,0 +1,162 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.CategoryModel;
+import com.app.whosnextapp.model.DiscoverModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class DiscoverActivity extends BaseAppCompatActivity implements TextWatcher, DiscoverAdapter.OnFilterApplyListener, AdapterView.OnItemSelectedListener {
+    @BindView(R.id.rv_discover_people)
+    RecyclerView rv_discover_people;
+    @BindView(R.id.sp_category)
+    Spinner sp_category;
+    @BindView(R.id.et_search_people)
+    EditText et_search_people;
+    DiscoverAdapter discoverAdapter;
+    Globals globals;
+    DiscoverAdapter.OnFilterApplyListener listener;
+    private List<CategoryModel.CategoryList> data;
+    private List<DiscoverModel.CustomerList> cdata;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_discover);
+        init();
+    }
+
+    private void init() {
+        globals = (Globals) getApplicationContext();
+        listener = this;
+        ButterKnife.bind(this);
+        doRequestForCategory();
+        et_search_people.addTextChangedListener(this);
+        data = new ArrayList<>();
+    }
+
+    private void doRequestForCategory() {
+        final String requestURL = getString(R.string.get_talent_category_url);
+        new PostRequest(DiscoverActivity.this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                CategoryModel categoryModel = new Gson().fromJson(response, CategoryModel.class);
+                if (categoryModel != null && categoryModel.getCategoryList() != null) {
+                    data = categoryModel.getCategoryList();
+                    showListinSpinner();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(DiscoverActivity.this, msg);
+            }
+        }).execute();
+    }
+
+    private void showListinSpinner() {
+        final String items[] = new String[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            items[i] = data.get(i).getCategoryName();
+        }
+        final ArrayAdapter<String> adapter;
+        adapter = new ArrayAdapter<>(DiscoverActivity.this, android.R.layout.simple_list_item_1, items);
+        adapter.setDropDownViewResource(R.layout.spinner_list);
+        sp_category.setAdapter(adapter);
+        sp_category.setOnItemSelectedListener(this);
+    }
+
+    private void doRequestForDiscoverPeople(Integer categoryid) {
+        final String requestURL = getString(R.string.get_discover_people_url);
+        JSONObject postData = HttpRequestHandler.getInstance()
+                .getDiscoverPeopleJson(1, categoryid, "");
+
+        new PostRequest(DiscoverActivity.this, postData, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                DiscoverModel discoverModel = new Gson().fromJson(response, DiscoverModel.class);
+                if (discoverModel != null && discoverModel.getCustomerList() != null) {
+                    cdata = discoverModel.getCustomerList();
+                    setDiscoverAdapter();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(DiscoverActivity.this, msg);
+                finish();
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void setDiscoverAdapter() {
+        if (discoverAdapter == null) {
+            discoverAdapter = new DiscoverAdapter(getApplicationContext(), listener);
+        }
+        if (rv_discover_people.getAdapter() == null) {
+            rv_discover_people.setHasFixedSize(true);
+            rv_discover_people.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            rv_discover_people.setAdapter(discoverAdapter);
+        }
+        discoverAdapter.doReferesh(cdata);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        searchPeople(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    private void searchPeople(String text) {
+        if (discoverAdapter != null) {
+            discoverAdapter.getFilter().filter(text);
+        }
+    }
+
+    @Override
+    public void onFilter(boolean IsShow) {
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Integer categoryid = sp_category.getSelectedItemPosition();
+        doRequestForDiscoverPeople(categoryid);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+}

@@ -1,0 +1,375 @@
+<resources>
+    <string name="app_name">Who\'s Next</string>
+    <string name="app_provider">com.app.whosnextapp.provider</string>
+    <string name="text_who_next">Who\'s this?</string>
+    <string name="what_your_talent">What\'s your talent \?</string>
+    <string name="text_who_s_next_app"> Who\'s next app</string>
+
+    <!--Login & Registration-->
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="create_your_account">Create your account?</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="text_terms_conditions_privacy_policy">I Accept Privacy Policy Terms &amp; Condition</string>
+    <string name="err_password_and_new_password_are_same">Old password and new password can not be same</string>
+    <string name="err_empty_retype_password">Please retype your new password</string>f
+    <string name="err_empty_current_password">Please enter your old password</string>
+    <string name="current_password">Current password</string>
+    <string name="retype_new_password">Retype new password</string>
+    <string name="email">Email</string>
+    <string name="confirm_email">Confirm Email</string>
+    <string name="submit">Submit</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="msg_server_error_wrong_password">Current password is wrong.</string>
+    <string name="err_empty_user_name">Please enter your username</string>
+    <string name="err_empty_last_name">Please enter your last name</string>
+    <string name="err_empty_first_name">Please enter your first name</string>
+    <string name="err_empty_type_name">Please Enter type name</string>
+    <string name="err_empty_description">Please Enter Description</string>
+    <string name="err_empty_button_name">Please Enter Button Name</string>
+    <string name="err_empty_button_link">Please Enter Button Link</string>
+
+    <string name="err_empty_password">Please enter your password</string>
+    <string name="err_empty_verification_code">Please enter verificationcode.</string>
+    <string name="msg_server_error">Error occurred, Please try again.</string>
+    <string name="err_username_password_in_correct">Username or Password is invalid.</string>
+    <string name="err_empty_emailId">Please enter your email ID</string>
+    <string name="err_valid_emailId">Please enter your valid email ID</string>
+    <string name="err_check_confirm_emailId">Please Check your Confirm email id.</string>
+    <string name="err_check_confirm_new_password">Your confirmed password does not match to password</string>
+    <string name="It_is_not_valid_code">It is not valid code.Please enter the correct verification code</string>
+    <string name="err_empty_new_password">Please enter new password.</string>
+    <string name="err_empty_Confirm_new_password">Please enter Confirm new Password.</string>
+    <string name="err_empty_Confirm_new_email">Please enter your confirmed email ID</string>
+    <string name="err_password_not_equals">Your confirmed password does not match to password</string>
+    <string name="err_required_terms_policy">Please accept our terms &amp; condition and privacy policy</string>
+    <string name="select_video">Select video</string>
+    <string name="toast_cannot_retrieve_selected_video">Cannot retrieve selected video</string>
+    <string name="msg_NO_INTERNET_TITLE">Internet connection required.</string>
+    <string name="msg_NO_INTERNET_MSG">You need an active internet connection to access this feature of the app.</string>
+    <string name="msg_goto_settings">SETTINGS</string>
+    <string name="error_msg_connection_timeout">The request timed out please try again.</string>
+    <string name="video_option">Capture Video</string>
+    <string name="text_pick_video">Pick video from gallery</string>
+    <string name="text_video">Add Introduction Video (Max 30 Sec)</string>
+    <string name="register">Register</string>
+    <string name="select_talent">Select your talent or business please</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="request_camera_permission">We need Camera &amp; Gallery permissions for Who\'s Next App</string>
+    <string name="on_denied_permission">If you reject permission,you can not use this service
+        <br />
+        Please turn on permissions at [Setting] > [Permission]
+    </string>
+    <string name="msg_update_profile">Profile Updated</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="msg_password_change_success">Password change successfully.</string>
+    <string name="search">Search</string>
+    <string name="trim_videos">Trim video</string>
+    <string name="trim_video_time">00:00 - 00:30</string>
+    <string name="time_00">00:00</string>
+    <string name="max_limit_reached">Please select your talent / business less than three.</string>
+    <string name="err_min_length_password">Password should be minimum 6 Characters.</string>
+    <string name="ok">OK</string>
+    <string name="take_from_camera">Take From Camera</string>
+    <string name="select_from_library">Select From Library</string>
+    <string name="trim">Trim</string>
+    <string name="err_valid_username">Username must be 4 characters.</string>
+    <string name="err_required_upload">Please Upload Image or Video</string>
+    <string name="err_required_category">Please select at least one talent of you</string>
+    <string name="wrong_data_content">There was something wrong with your data. Please try again.</string>
+    <string name="search_talent">Add your talent or business please</string>
+    <string name="add">Add</string>
+    <string name="done">Done</string>
+    <string name="terms_condition">Terms &amp; condition</string>
+    <string name="your_confirm_email_id_does_not_match">Your confirmed email id does not match to email id</string>
+    <string name="registration_success">Registration successful.</string>
+
+    <!--Discover people & My Profile-->
+    <string name="posts">Posts</string>
+    <string name="post">Post</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="introduction_bio_video">Introduction bio video</string>
+    <string name="about_self">About Self</string>
+    <string name="city">City</string>
+    <string name="category">Category</string>
+    <string name="make_this_profile_private">Make this profile private</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="views">Views</string>
+    <string name="private_user">User is private</string>
+    <string name="profile_is_private">When your profile is private.Only people you approve can see your photos and videos.Your existing followers won\'t be effected.</string>
+    <string name="group_video">Group video</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="website">Website</string>
+    <string name="replace_video">Replace video</string>
+    <string name="update">Update</string>
+    <string name="website_1">Website-1</string>
+    <string name="website_2">Website-2</string>
+    <string name="website_3">Website-3</string>
+    <string name="website_4">Website-4</string>
+    <string name="website_5">Website-5</string>
+    <string name="describe_yourself_in_1_word">Describe yourself in 1 word</string>
+    <string name="cancel">Cancel</string>
+    <string name="de_active_account">Deactive Account</string>
+    <string name="pictures_of_you">Pictures of you</string>
+    <string name="http">http://</string>
+    <string name="text_select_category">Select Category</string>
+
+    <!--Follower & Following-->
+    <string name="un_follow">Unfollow</string>
+    <string name="follow">+ Follow</string>
+    <string name="requested">Requested</string>
+    <string name="notification">Notification</string>
+    <string name="text_feed_post">Feed Post</string>
+    <string name="text_share_to">Share To</string>
+    <string name="text_write_caption">Write Caption</string>
+    <string name="text_message">Message</string>
+    <string name="text_coming_soon">Coming Soon</string>
+    <string name="msg_feed_shared">Feed has been shared</string>
+    <string name="text_capture_video">Capture video</string>
+    <string name="terms_condition_1">Terms &amp; condition:</string>
+    <string name="msg_now">now</string>
+    <string name="text_seconds">%1$s s</string>
+    <string name="text_min">%1$s m</string>
+    <string name="text_minutes">%1$s m</string>
+    <string name="text_day">%1$s day</string>
+    <string name="text_days">%1$s days</string>
+    <string name="text_hr">%1$s h</string>
+    <string name="text_views">%1$d Views</string>
+    <string name="text_uploading">Uploading\.\.\.</string>
+    <string name="text_saving">Saving\.\.\.\.</string>
+    <string name="text_tag_people">Tag people</string>
+    <string name="text_tap_tag_people">Tap to select people</string>
+    <string name="msg_picture_shared">Picture has been shared</string>
+    <string name="text_media">Media</string>
+    <string name="feed">Feed</string>
+    <string name="are_you_sure_want_to_logout">Are you sure you want to logout?</string>
+    <string name="de_active_your_profile">Are you sure want to deactivate your profile?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="text_caption">Caption</string>
+    <string name="text_follow_request_approve">Follow request - approve or ignore requests</string>
+    <string name="text_follow_request">Follow requests</string>
+    <string name="text_no_user_found">No user found</string>
+    <string name="text_home">Home</string>
+
+    <!--Snippets-->
+    <string name="text_snippets">Snippets</string>
+    <string name="text_snippets_details">Snippet details</string>
+    <string name="text_tap_on_image">Tap on image and play again</string>
+    <string name="text_no_snippet_detail">No snippet details</string>
+    <string name="text_please_enter_snippet">Please enter snippet details</string>
+    <string name="text_write_snippet">Write snippet details</string>
+    <string name="text_tap_icon">Tap on icon to select image, video or audio</string>
+    <string name="text_image">Image</string>
+    <string name="text_video_simple">Video</string>
+    <string name="text_audio">Audio</string>
+    <string name="text_select_snippet">Browse Your Image, Video and Audio</string>
+    <string name="text_browse_image">Browse Your Image</string>
+    <string name="text_browse_video">Browse Your Video</string>
+    <string name="text_browse_audio">Browse Your Audio</string>
+    <string name="text_camera">Camera</string>
+    <string name="text_gallery">Gallery</string>
+    <string name="msg_snippet_picture_shared">Snippet has been uploaded</string>
+    <string name="text_posts">Posts</string>
+    <string name="text_record">Record</string>
+    <string name="text_pick_from_library">Pick From Library</string>
+    <string name="text_enter_caption">Please enter caption</string>
+    <string name="text_record_description">Welcome back! please tap and hold button \nand start recording</string>
+    <string name="request_audio_permission">We need Audio record &amp; File permissions for Who\'s Next App</string>
+
+    <!--Menu-->
+    <string name="text_my_profile">My profile</string>
+    <string name="text_videos">Videos</string>
+    <string name="text_subscribe">Subscribe</string>
+    <string name="pictures">Pictures</string>
+    <string name="setting">Setting</string>
+    <string name="discover_people">Discover people</string>
+    <string name="text_gratitude">Gratitude</string>
+
+    <!--Ads-->
+    <string name="ads_on_dashboard">Ads On Dashboard</string>
+    <string name="page">Page</string>
+    <string name="_2_ads_per_month">2 Ads Per Month</string>
+    <string name="ads_on">Ads on</string>
+    <string name="dashboard_page">Dashboard Page</string>
+    <string name="featured_profile_page">Featured Profile Page</string>
+    <string name="dashboard_3_ads">Dashboard : 3 Ads</string>
+    <string name="per_month">per month</string>
+    <string name="featured_profile_1_ad">Featured Profile : 1 Ad</string>
+    <string name="subscription_for_ads">Subscription for ads</string>
+    <string name="and">&#38;</string>
+    <string name="_150">$150</string>
+    <string name="pay_now">Pay now</string>
+    <string name="users_can_publish_ads">users can publish ads within subscription month.Ads will be deleted after end of the subscription date</string>
+    <string name="_250">$250</string>
+    <string name="amount">Amount</string>
+    <string name="dollar">$</string>
+    <string name="thank_you">Thank You!</string>
+    <string name="please_write_your_comment_here">Please write your comment here.</string>
+    <string name="payment_amount">Payment Amount :</string>
+    <string name="status">Status :</string>
+    <string name="payment_id">Payment Id :</string>
+    <string name="text_user_cancel">The user canceled.</string>
+    <string name="text_invalid">An invalid Payment or PayPalConfiguration was submitted. Please see the docs.</string>
+    <string name="payment_example">paymentExample</string>
+    <string name="usd">USD</string>
+    <string name="response">response</string>
+    <string name="id">id</string>
+    <string name="state">state</string>
+
+    <!--Homepage-->
+    <string name="feeds_not_found">No Feeds Found</string>
+    <string name="No_messages_found">No Messages Found</string>
+
+    <string name="no_posts_yet">No Posts Yet</string>
+
+    <string name="likes">Likes</string>
+    <string name="text_likes">Likers</string>
+    <string name="add_a_comment">Add a comment</string>
+    <string name="view_all_comments">View All Comments</string>
+    <string name="text_comment">Comments</string>
+    <string name="text_share">Share</string>
+    <string name="text_messages">Messages</string>
+    <string name="breast_cancer_legacies">Breast Cancer Legacies</string>
+
+    <!--Breast cancer legacies-->
+    <string name="your_payment">Your Payment has been done Successfully</string>
+    <string name="created_by">Created By</string>
+    <string name="text_feeds_not_found">Feeds Not Found</string>
+    <string name="text_add_new">Add New</string>
+    <string name="text_add_picture">Add Picture</string>
+    <string name="text_add_name">Add Name</string>
+    <string name="text_add_description">Add Description</string>
+    <string name="please_type_description">Please type description</string>
+    <string name="please_type_name">Please type name</string>
+    <string name="add_carnation_during_upload">Add Carnation during Upload</string>
+    <string name="white_carnation">White Carnations-love and good luck fighting cancer</string>
+    <string name="pink_and_white">Pink and White Carnations-means you have beat cancer</string>
+    <string name="scrip_carnations">Scripped Carnations-some one passed away from cancer</string>
+    <string name="date_of_birth">Date Of Birth</string>
+    <string name="date_of_passing">Date of Passing</string>
+    <string name="mm_dd_yyyy">MM/DD/YYYY</string>
+    <string name="view_all">View All</string>
+    <string name="text_ads">Ads</string>
+    <string name="create_new">Createnewad</string>
+    <string name="add_picture_or_video">Add picture or video</string>
+    <string name="ad_description">Ad description</string>
+    <string name="button_name">Button name</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="enter_button_name">Enter Button Name</string>
+    <string name="button_link">Button Link</string>
+    <string name="enter_button_link">Enter Button Link</string>
+    <string name="text_publish">Publish</string>
+    <string name="delete">Delete</string>
+    <string name="gallery_option">Pick video from gallery</string>
+    <string name="show_dialog">Please select your talent / business less than three</string>
+
+    <!--Message-->
+    <string name="text_select_people">Select people</string>
+    <string name="dlg_signal_error">Disconnected… Please check your Internet connection!</string>
+    <string name="permission_unavailable">%s is not available now!</string>
+
+    <!--menu-->
+    <string name="action_settings">Settings</string>
+    <string name="action_screen_share">Screen share</string>
+    <string name="action_update_opponens_list">Update opponents list</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_start_video_call">Video call</string>
+    <string name="action_start_audio_call">Audio call</string>
+    <string name="text_write_message">Write message</string>
+
+    <!--action bar-->
+    <string name="also_on_call">Also on call:</string>
+    <string name="user_list_on_call">User 1, User 2, User 3, User 4, User 5, User 6</string>
+    <string name="opponent_pending">Pending</string>
+    <string name="opponent_closed">Closed</string>
+    <string name="text_incoming_audio_call">Incoming Audio Call</string>
+    <string name="text_incoming_video_call">Incoming Video Call</string>
+    <string name="text_status_connect">Connect…</string>
+    <string name="text_status_checking">Checking…</string>
+    <string name="text_status_connected">Connected</string>
+    <string name="text_status_disconnected">Disconnected</string>
+    <string name="text_status_rejected">Rejected</string>
+    <string name="text_status_no_answer">No answer</string>
+    <string name="text_status_hang_up">Hang up</string>
+    <string name="text_status_closed">Closed</string>
+    <string name="text_push_notification_message">"%s is calling you"</string>
+
+    <!--Call Settings-->
+    <string name="pref_answer_time_interval_key">answer_time_interval</string>
+    <string name="pref_answer_time_interval_default_value">60</string>
+    <string name="pref_disconnect_time_interval_key">disconnect_time_interval</string>
+    <string name="pref_disconnect_time_interval_default_value">10</string>
+    <string name="pref_dialing_time_interval_key">Dialing_time_interval</string>
+    <string name="pref_dialing_time_interval_default_value">5</string>
+    <string name="accepted">Accepted</string>
+    <string name="ringing">Ringing</string>
+    <string name="stop_share">Stop</string>
+
+    <!--Group Video-->
+    <string name="msg_no_message">No message</string>
+    <string name="err_msg_unble_to_send">Unable to send try again</string>
+    <string name="publish_3_ads_in_month">Already Publish 3 ad in this month</string>
+    <string name="text_write_video_detail">Write video details</string>
+    <string name="text_select_people_to_tag">Select People To Tag</string>
+    <string name="text_enter_video_details">Please enter video details</string>
+    <string name="text_invite">Invite</string>
+    <string name="err_msg_cannot_select_more_friends">You can not select more then 4 friends.</string>
+    <string name="msg_err_must_invite_friends">You must invite 4 friends.</string>
+    <string name="msg_group_video_invite_success">Group video uploaded and invitation send successfully.</string>
+    <string name="text_accept">Accept</string>
+    <string name="text_decline">Decline</string>
+    <string name="text_video_preview">Video preview</string>
+    <string name="err_fail_to_send">Invitation fail to send.</string>
+    <string name="msg_err_must_invite_one_friends">You can not select more then 1 friends.</string>
+    <string name="are_you_sure_want_to_decline">Are you sure you want to decline the request to Group Video?</string>
+    <string name="msg_group_admin">I Started a group video</string>
+    <string name="msg_group_invited_user">invited you to his group video</string>
+
+    <!-- DateTime -->
+    <string name="diff_year">year</string>
+    <string name="diff_years">years</string>
+    <string name="diff_month">month</string>
+    <string name="diff_months">months</string>
+    <string name="diff_week">week</string>
+    <string name="diff_weeks">weeks</string>
+    <string name="diff_day">day</string>
+    <string name="diff_days">days</string>
+    <string name="diff_hour">hour</string>
+    <string name="diff_hours">hours</string>
+    <string name="diff_min">min</string>
+    <string name="diff_mins">mins</string>
+    <string name="diff_minute">minute</string>
+    <string name="diff_minutes">minutes</string>
+    <string name="diff_second">second</string>
+    <string name="diff_seconds">seconds</string>
+    <string name="ago">%1$s ago</string>
+    <string name="just_now">just now</string>
+
+    <string name="msg_sent_successfully">Message sent successfully.</string>
+    <string name="msg_select_person">Please select at least one person.</string>
+    <string name="send">Send</string>
+    <string name="text_uploaded">Uploaded</string>
+    <string name="text_share_msg"> Created By : %1$s</string>
+    <string name="msg_press_back_exit">Please press back again to exit.</string>
+    <string name="text_turn_on_notification">Turn on notification</string>
+    <string name="text_turn_off_notification">Turn off notification</string>
+    <string name="text_select_option">Select Option</string>
+    <string name="text_edit_post">Edit Post</string>
+    <string name="text_delete_post">Delete Post</string>
+    <string name="text_report_msg">Thank you for your Report We will remove this photo/video if it violates our community Guidelines</string>
+
+    <!-- Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_report">Report</string>
+    <string name="text_unfollow">Unfollow</string>
+    <string name="text_Please_upload_image">Please Upload Image</string>
+
+</resources>

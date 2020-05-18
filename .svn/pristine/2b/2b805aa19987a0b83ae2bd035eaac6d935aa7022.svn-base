@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <include layout="@layout/header1_layout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/dim_55"
+            android:layout_marginLeft="@dimen/dim_55"
+            android:layout_marginEnd="@dimen/dim_55"
+            android:layout_marginRight="@dimen/dim_55"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_verification_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:hint="@string/verification_code"
+                android:maxLines="1"
+                android:padding="@dimen/dim_15"
+                android:textColor="@android:color/black"
+                android:textColorHighlight="@color/gray"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_16" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_submit"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dim_80"
+                android:background="@drawable/shapebutton"
+                android:fontFamily="@font/aboxfor"
+                android:gravity="center"
+                android:shadowColor="@android:color/transparent"
+                android:text="@string/submit"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_18" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

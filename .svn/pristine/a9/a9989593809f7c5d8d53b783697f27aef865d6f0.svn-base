@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:background="@drawable/banner"
+    android:orientation="vertical"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dim_10"
+        android:layout_marginTop="@dimen/dim_10"
+        android:layout_marginBottom="@dimen/dim_35"
+        android:fontFamily="@font/aboxfor"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_25" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dim_30"
+        android:baselineAligned="false"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_Posts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_count_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:text="@string/posts"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_followers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_count_followers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:text="@string/followers"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_followings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_count_following"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aboxfor2"
+                android:text="@string/following"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_25" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

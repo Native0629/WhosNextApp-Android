@@ -1,0 +1,74 @@
+package com.app.whosnextapp.quickblox.utils;
+
+public class ConstantEnum {
+
+    public enum ChatMassegeType {
+        text(0),
+        image(1),
+        video(2),
+        link(3);
+
+        private int Id;
+
+        ChatMassegeType(final int id) {
+            this.Id = id;
+        }
+
+        public int getId() {
+            return Id;
+        }
+    }
+
+    public enum QuickBloxDialogType {
+        all,
+        private_chat,
+        public_group,
+        private_group;
+    }
+
+    public enum UserType {
+        owner(0),
+        opponent(1);
+
+        private int Id;
+
+        UserType(final int id) {
+            this.Id = id;
+        }
+
+        public int getId() {
+            return Id;
+        }
+    }
+
+    public enum JournalViewType {
+        ADD,
+        EDIT,
+        VIEW;
+    }
+
+    public enum presetCurrentStatus {
+        no_changes(0),
+        updated(1),
+        deleted(2),
+        new_added(3);
+
+        private int Id;
+
+        presetCurrentStatus(int id) {
+            this.Id = id;
+        }
+
+        public int getId() {
+            return Id;
+        }
+    }
+
+    public enum MediaType {
+        audio,
+        video,
+        pdf,
+        blogs,
+        web;
+    }
+}

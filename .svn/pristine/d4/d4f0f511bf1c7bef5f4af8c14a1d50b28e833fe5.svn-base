@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/robotoregular"
+        android:textColor="@color/red"
+        android:textSize="@dimen/text_size_18" />
+
+    <com.linkedin.android.spyglass.ui.MentionsEditText
+        android:id="@+id/tv_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dim_10"
+        android:background="@android:color/transparent"
+        android:enabled="false"
+        android:fontFamily="@font/ayearwithoutrain"
+        android:imeOptions="flagNoExtractUi"
+        android:inputType="none"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_20"
+        app:mentionTextColor="@color/red"
+        app:selectedMentionTextColor="@color/red"
+        tools:ignore="RtlHardcoded" />
+
+</LinearLayout>

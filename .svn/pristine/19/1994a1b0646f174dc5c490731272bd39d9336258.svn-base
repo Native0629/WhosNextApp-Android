@@ -1,0 +1,296 @@
+package com.app.whosnextapp.navigationmenu;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.HeaderAllPostActivity;
+import com.app.whosnextapp.model.FollowUnfollowModel;
+import com.app.whosnextapp.model.GetProfileByCustomerIdModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.gson.Gson;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class OtherUserProfileActivity extends BaseAppCompatActivity implements View.OnClickListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.tv_username)
+    TextView tv_username;
+    @BindView(R.id.tv_count_post)
+    TextView tv_count_post;
+    @BindView(R.id.tv_count_following)
+    TextView tv_count_following;
+    @BindView(R.id.tv_count_followers)
+    TextView tv_count_followers;
+    @BindView(R.id.ll_private)
+    LinearLayout ll_private;
+    @BindView(R.id.ll_public)
+    LinearLayout ll_public;
+    @BindView(R.id.tv_about_self)
+    TextView tv_about_self;
+    @BindView(R.id.tv_city)
+    TextView tv_city;
+    @BindView(R.id.tv_website1)
+    AppCompatTextView tv_website1;
+    @BindView(R.id.tv_website2)
+    AppCompatTextView tv_website2;
+    @BindView(R.id.tv_website3)
+    AppCompatTextView tv_website3;
+    @BindView(R.id.tv_website4)
+    AppCompatTextView tv_website4;
+    @BindView(R.id.tv_website5)
+    AppCompatTextView tv_website5;
+    @BindView(R.id.tv_category)
+    TextView tv_category;
+    @BindView(R.id.tv_views)
+    TextView tv_views;
+    @BindView(R.id.btn_follow)
+    Button btn_follow;
+    @BindView(R.id.exoplayer)
+    PlayerView player;
+
+    DataSource.Factory dataSourceFactory;
+    SimpleExoPlayer exoPlayer;
+    Globals globals;
+    Integer customer_id, cid, result;
+    Boolean isPrivate, isFollowing, isRequested;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_discover_profile);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        setActionBar();
+        customer_id = getIntent().getIntExtra(Constants.WN_CUSTOMER_ID, 0);
+        doRequestToProfileDetails();
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.color.red);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    private void doRequestToProfileDetails() {
+        final String requestURL = String.format(getString(R.string.get_discover_people_by_customer_id_url), customer_id);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetProfileByCustomerIdModel getProfileByCustomerIdModel = new Gson().fromJson(response, GetProfileByCustomerIdModel.class);
+                if (getProfileByCustomerIdModel != null) {
+                    setData(getProfileByCustomerIdModel);
+                } else {
+                    Globals.showToast(getApplicationContext(), getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getApplicationContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @OnClick(R.id.btn_follow)
+    public void onFollowUser() {
+        doRequestToFollowUserProfile();
+    }
+
+    private void doRequestToFollowUserProfile() {
+        final String requestURL = String.format(getString(R.string.get_follow_user_url), customer_id, result);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                FollowUnfollowModel followUnfollowModel = new Gson().fromJson(response, FollowUnfollowModel.class);
+                if (followUnfollowModel != null && followUnfollowModel.getResult() != null) {
+                    doRefreshFollowerCount();
+                } else {
+                    Globals.showToast(getApplicationContext(), getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getApplicationContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    public void doRefreshFollowerCount() {
+        String requestURL = String.format(getString(R.string.get_discover_people_by_customer_id_url), customer_id);
+        new PostRequest(this, null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                GetProfileByCustomerIdModel getProfileByCustomerIdModel = new Gson().fromJson(response, GetProfileByCustomerIdModel.class);
+                if (getProfileByCustomerIdModel != null) {
+                    tv_count_followers.setText(getProfileByCustomerIdModel.getCustomerDetail().getTotalFollowers());
+                    isFollowing = getProfileByCustomerIdModel.getCustomerDetail().getIsFollowing();
+                    isRequested = getProfileByCustomerIdModel.getCustomerDetail().getIsRequested();
+                    if (isFollowing || isRequested) {
+                        if (isPrivate) {
+                            btn_follow.setText(R.string.requested);
+                            result = 0;
+                        } else {
+                            btn_follow.setText(R.string.following);
+                            result = 0;
+                        }
+                    } else {
+                        btn_follow.setText(R.string.follow);
+                        result = 1;
+                    }
+                } else {
+                    Globals.showToast(getApplicationContext(), getString(R.string.msg_server_error));
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(getApplicationContext(), msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+
+    private void setData(GetProfileByCustomerIdModel getProfileByCustomerIdModel) {
+        tv_username.setText(getProfileByCustomerIdModel.getCustomerDetail().getUserName());
+        tv_count_post.setText(getProfileByCustomerIdModel.getCustomerDetail().getTotalPost());
+        tv_count_followers.setText(getProfileByCustomerIdModel.getCustomerDetail().getTotalFollowers());
+        tv_count_following.setText(getProfileByCustomerIdModel.getCustomerDetail().getTotalFollowings());
+        tv_views.setText(String.valueOf(getProfileByCustomerIdModel.getCustomerDetail().getTotalProfileVideoViews()));
+        tv_about_self.setText(String.valueOf(getProfileByCustomerIdModel.getCustomerDetail().getAboutSelf()));
+        tv_city.setText(String.valueOf(getProfileByCustomerIdModel.getCustomerDetail().getCity()));
+
+        String videoUrl = getProfileByCustomerIdModel.getCustomerDetail().getBioVideoUrl();
+
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        exoPlayer.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+        player.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+        player.setPlayer(exoPlayer);
+        dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
+
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(videoUrl));
+        LoopingMediaSource loopingMediaSource = new LoopingMediaSource(videoSource);
+        exoPlayer.prepare(loopingMediaSource);
+        exoPlayer.setPlayWhenReady(true);
+
+        AppCompatTextView[] websiteText = new AppCompatTextView[]{tv_website1, tv_website2, tv_website3, tv_website4, tv_website5};
+        String[] separated = getProfileByCustomerIdModel.getCustomerDetail().getWebsite().split(",");
+        for (int i = 0; i < separated.length; i++) {
+            websiteText[i].setText(separated[i]);
+        }
+
+        tv_category.setText(getProfileByCustomerIdModel.getCustomerDetail().getCategoryNames());
+        isPrivate = getProfileByCustomerIdModel.getCustomerDetail().getIsPrivate();
+        isRequested = getProfileByCustomerIdModel.getCustomerDetail().getIsRequested();
+        toolbar_title.setText(getProfileByCustomerIdModel.getCustomerDetail().getFirstName() + " " + getProfileByCustomerIdModel.getCustomerDetail().getLastName());
+        cid = getProfileByCustomerIdModel.getCustomerDetail().getCustomerId();
+        if (!isPrivate) {
+            ll_public.setVisibility(View.VISIBLE);
+            ll_private.setVisibility(View.GONE);
+        } else {
+            ll_public.setVisibility(View.GONE);
+            ll_private.setVisibility(View.VISIBLE);
+        }
+        isFollowing = getProfileByCustomerIdModel.getCustomerDetail().getIsFollowing();
+        if (isRequested) {
+            btn_follow.setText(R.string.requested);
+            result = 0;
+        } else {
+            if (isFollowing) {
+                btn_follow.setText(R.string.following);
+                result = 0;
+            } else {
+                btn_follow.setText(R.string.follow);
+                result = 1;
+            }
+        }
+    }
+
+    @OnClick(R.id.ll_followers)
+    public void onFollowerClick() {
+        Intent intent = new Intent(this, FollowerActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, cid);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.ll_followings)
+    public void onFollowingClick() {
+        Intent intent = new Intent(this, FollowingActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, cid);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.ll_Posts)
+    public void onPostClick() {
+        Intent intent = new Intent(this, HeaderAllPostActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, cid);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.getPlaybackState();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        if (exoPlayer != null) {
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+        super.onStop();
+    }
+}

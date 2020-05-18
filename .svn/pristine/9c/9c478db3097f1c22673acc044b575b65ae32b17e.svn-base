@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cancel">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dim_10"
+            android:background="@drawable/edittext_search_rounded"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/dim_35"
+                android:layout_height="@dimen/dim_35"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/dim_5"
+                app:srcCompat="@drawable/search_talent" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_search_talent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:hint="@string/search_talent"
+                android:singleLine="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/dim_10"
+                android:layout_marginRight="@dimen/dim_10"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:text="@string/add"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_25"
+                android:visibility="gone"
+                tools:ignore="RtlHardcoded" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_select_talent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:background="@color/done"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:text="@string/done"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:background="@color/cancel"
+            android:fontFamily="@font/ayearwithoutrain"
+            android:text="@string/cancel"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
+    </LinearLayout>
+</LinearLayout>

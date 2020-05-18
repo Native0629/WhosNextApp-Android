@@ -1,0 +1,662 @@
+package com.app.whosnextapp.apis;
+
+import com.app.whosnextapp.model.GroupListModel;
+import com.app.whosnextapp.model.TagListModel;
+import com.app.whosnextapp.utility.Constants;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+
+public class HttpRequestHandler {
+
+    private static HttpRequestHandler mInstance = null;
+
+    private HttpRequestHandler() {
+    }
+
+    public static HttpRequestHandler getInstance() {
+        if (mInstance == null) {
+            mInstance = new HttpRequestHandler();
+        }
+        return mInstance;
+    }
+
+    public JSONObject getDiscoverPeopleJson(Integer spCallCount, Integer categoryId, String searchKeyWord) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_SP_CALL_COUNT, spCallCount);
+            paramObject.put(Constants.WN_CATEGORY_ID, categoryId);
+            paramObject.put(Constants.WN_SEARCH_KEY_WORD, searchKeyWord);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getChangePasswordJson(String OldPassword, String NewPassword) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_CUSTOMER_PASSWORD, getChangePasswordDetails(OldPassword, NewPassword));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getChangePasswordDetails(String oldPassword, String newPassword) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_OLD_PASSWORD, oldPassword);
+            paramObject.put(Constants.WN_NEW_PASSWORD, newPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getAddNewBreastCancerLegacy(String DOB, String BCLWidth, String FlowerType, String ImageBase64String, String BCLHeight, String Name, String Description, String DOP) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_BREAST_CANCER_LEGACY, getAddNewBreastCancerLegacyDetails(DOB, BCLWidth, FlowerType, ImageBase64String, BCLHeight, Name, Description, DOP));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getAddNewBreastCancerLegacyDetails(String DOB, String BCLWidth, String FlowerType, String ImageBase64String, String BCLHeight, String Name, String Description, String DOP) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_DOB, DOB);
+            paramObject.put(Constants.WN_BCLWidth, BCLWidth);
+            paramObject.put(Constants.WN_FLOWER_TYPE, FlowerType);
+            paramObject.put(Constants.WN_IMAGE_BASE_64_STRING, ImageBase64String);
+            paramObject.put(Constants.WN_BCL_HEIGHT, BCLHeight);
+            paramObject.put(Constants.WN_NAME, Name);
+            paramObject.put(Constants.WN_DESCRIPTION, Description);
+            paramObject.put(Constants.WN_DOP, DOP);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getEditBreastCancerLegacy(String DOB, String BreastCancerLegacyId, String BCLWidth, String FlowerType, String ImageBase64String, String BCLHeight, String Name, String Description, String DOP) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_BREAST_CANCER_LEGACY, getEditBreastCancerLegacyDetails(DOB, BreastCancerLegacyId, BCLWidth, FlowerType, ImageBase64String, BCLHeight, Name, Description, DOP));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getEditBreastCancerLegacyDetails(String DOB, String BreastCancerLegacyId, String BCLWidth, String FlowerType, String ImageBase64String, String BCLHeight, String Name, String Description, String DOP) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_DOB, DOB);
+            paramObject.put(Constants.WN_BREAST_CANCER_LEGACY_ID, BreastCancerLegacyId);
+            paramObject.put(Constants.WN_BCLWidth, BCLWidth);
+            paramObject.put(Constants.WN_FLOWER_TYPE, FlowerType);
+            paramObject.put(Constants.WN_IMAGE_BASE_64_STRING, ImageBase64String);
+            paramObject.put(Constants.WN_BCL_HEIGHT, BCLHeight);
+            paramObject.put(Constants.WN_NAME, Name);
+            paramObject.put(Constants.WN_DESCRIPTION, Description);
+            paramObject.put(Constants.WN_DOP, DOP);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getRegisterJson(String CategoryIds, String CategoryNames, String ProfilePicBase64String,
+                                      String BioVideoBase64String, String LastName, String DeviceType, String Password,
+                                      String UserName, String DeviceToken, String Email, String FirstName) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_CUSTOMER, getRegisterDetails(CategoryIds, CategoryNames, ProfilePicBase64String, BioVideoBase64String,
+                    LastName, DeviceType, Password, UserName, DeviceToken, Email, FirstName));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getRegisterDetails(String categoryIds, String categoryNames, String ProfilePicBase64String,
+                                          String BioVideoBase64String, String lastName, String deviceType, String password,
+                                          String userName, String deviceToken, String email, String firstName) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_CATEGORY_IDS, categoryIds);
+            paramObject.put(Constants.WN_CATEGORY_NAMES, categoryNames);
+            paramObject.put(Constants.WN_Profile_Pic_Base64, ProfilePicBase64String);
+            paramObject.put(Constants.WN_Bio_Video_Base64String, BioVideoBase64String);
+            paramObject.put(Constants.WN_LAST_NAME, lastName);
+            paramObject.put(Constants.WN_DEVICE_TYPE, deviceType);
+            paramObject.put(Constants.WN_PASSWORD, password);
+            paramObject.put(Constants.WN_USERNAME, userName);
+            paramObject.put(Constants.WN_DEVICE_TOKEN, deviceToken);
+            paramObject.put(Constants.WN_EMAIL, email);
+            paramObject.put(Constants.WN_FIRST_NAME, firstName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getReportJson(String PostType, String PostId, String Comment) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_Report_problem, getReportDetail(PostType, PostId, Comment));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getReportDetail(String PostType, String PostId, String Comment) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_POSTTYPE, PostType);
+            paramObject.put(Constants.WN_POST_ID, PostId);
+            paramObject.put(Constants.WN_COMMENT, Comment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getLoginJson(String TestDeviceToken, String Username, String DeviceType, String Password) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_CUSTOMER, getUserDetails(TestDeviceToken, Username, DeviceType, Password));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getUserDetails(String testDeviceToken, String username, String deviceType, String password) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_DEVICE_TOKEN, testDeviceToken);
+            paramObject.put(Constants.WN_USERNAME, username);
+            paramObject.put(Constants.WN_DEVICE_TYPE, deviceType);
+            paramObject.put(Constants.WN_PASSWORD, password);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getInsertGratitudeJson(String TransactionId, String Amount, String Comments) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_GRATITUDE, getInsertGratitudeDetails(TransactionId, Amount, Comments));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getInsertGratitudeDetails(String TransactionId, String Amount, String Comments) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_TRANSACTION_ID, TransactionId);
+            paramObject.put(Constants.WN_AMOUNT, Amount);
+            paramObject.put(Constants.WN_COMMENTS, Comments);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getAdCommentJson(String AdCommentId, String AdId, String Comment) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_AD_COMMENT, getAdCommentDetails(AdCommentId, AdId, Comment));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getAdCommentDetails(String AdCommentId, String AdId, String Comment) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_AD_COMMENT_ID, AdCommentId);
+            paramObject.put(Constants.WN_AD_ID, AdId);
+            paramObject.put(Constants.WN_COMMENT, Comment);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getAddNewAdJSON(String ButtonLink, String ButtonName, int ImageHeight, int ImageWidth, String Description, String imagePath, int IsImage, int IsVideo, int VideoWidth, String VideoBase64String, String VideoThumbnailBase64String, int VideoHeight) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_AD, getAdnewDetails(ButtonLink, ButtonName, ImageHeight, ImageWidth, Description, imagePath, IsImage, IsVideo, VideoWidth, VideoBase64String, VideoThumbnailBase64String, VideoHeight));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject editPostJson(String PostId, String Latitude, String IsImage, String Caption, String UserName, String YCordinate, String XCordinate, String Longitude, String IsVideo, String Location) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_POST, editPostDetails(PostId, Latitude, IsImage, Caption, UserName, YCordinate, XCordinate, Longitude, IsVideo, Location));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return paramObject;
+    }
+
+    private JSONObject editPostDetails(String PostId, String Latitude, String IsImage, String Caption, String UserName, String YCordinate, String XCordinate, String Longitude, String IsVideo, String Location) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_POST_ID, PostId);
+            paramObject.put(Constants.WN_LATITUDE, Latitude);
+            paramObject.put(Constants.WN_IS_IMAGE, IsImage);
+            paramObject.put(Constants.CAPTION, Caption);
+
+            JSONArray paramArray = new JSONArray();
+            JSONObject Object = new JSONObject();
+            Object.put(Constants.WN_USERNAME, UserName);
+            Object.put(Constants.WN_YCORDINATE, YCordinate);
+            Object.put(Constants.WN_XCORDINATE, XCordinate);
+            paramArray.put(Object);
+            paramObject.put(Constants.WN_POSTTAG_LIST, paramArray);
+
+            paramObject.put(Constants.WN_LONGITUDE, Longitude);
+            paramObject.put(Constants.WN_IS_VIDEO, IsVideo);
+            paramObject.put(Constants.WN_LOCATION, Location);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+
+    }
+
+    private JSONObject getAdnewDetails(String ButtonLink, String ButtonName, int ImageHeight, int ImageWidth, String Description, String imagePath, int IsImage, int IsVideo, int VideoWidth, String VideoBase64String, String VideoThumbnailBase64String, int VideoHeight) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            if (IsVideo != 1) {
+                JSONArray paramArray = new JSONArray();
+                JSONObject Object = new JSONObject();
+                Object.put(Constants.WN_IMAGE_BASE_64_STRING, imagePath);
+                Object.put(Constants.WN_IMAGE_HEIGHT, ImageHeight);
+                Object.put(Constants.WN_IMAGE_WIDTH, ImageWidth);
+                paramArray.put(Object);
+                paramObject.put(Constants.WN_Image_List, paramArray);
+            }
+
+            paramObject.put(Constants.WN_BUTTON_LINK, ButtonLink);
+            paramObject.put(Constants.WN_BUTTON_NAME, ButtonName);
+            paramObject.put(Constants.WN_DESCRIPTION, Description);
+            paramObject.put(Constants.WN_IS_IMAGE, IsImage);
+            paramObject.put(Constants.WN_IS_VIDEO, IsVideo);
+
+            if (IsVideo == 1) {
+                paramObject.put(Constants.WN_Video_width, VideoWidth);
+                paramObject.put(Constants.WN_VIDEO_BASE, VideoBase64String);
+                paramObject.put(Constants.WN_VIDEO_THUMBNAIL_BASE_URL, VideoThumbnailBase64String);
+                paramObject.put(Constants.WN_VIDEO_HEIGHT, VideoHeight);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getAddSubscriptionsJson(String SubscriptionTypeId, JSONObject PayPalResponse) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_SUBSCRIPTION, getSubscriptionsDetails(SubscriptionTypeId, PayPalResponse));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getSubscriptionsDetails(String SubscriptionTypeId, JSONObject PaypalResponse) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_SUBSCRIPTION_TYPE_ID, SubscriptionTypeId);
+            paramObject.put(Constants.WN_PAY_PAL_RESPONSE, PaypalResponse.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getAddPostCommentDetailsJson(String Comment, int IsImage, int IsText, String PostCommentId, String PostId) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_POST_COMMENTS, getUserAddCommentDetails(Comment, IsImage, IsText, PostCommentId, PostId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getUserAddCommentDetails(String Comment, int IsImage, int IsText, String PostCommentId, String PostId) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_COMMENT, Comment);
+            paramObject.put(Constants.WN_IS_IMAGE, IsImage);
+            paramObject.put(Constants.WN_IS_TEXT, IsText);
+            paramObject.put(Constants.WN_POST_COMMENT_ID, PostCommentId);
+            paramObject.put(Constants.WN_POST_ID, PostId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getAddBCLCommentJson(String BCLCommentId, String BreastCancerLegacyId, String Comment, int IsImage, int IsText) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_BCL_COMMENT, getAddBCLCommentDetails(BCLCommentId, BreastCancerLegacyId, Comment, IsImage, IsText));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getAddBCLCommentDetails(String BCLCommentId, String BreastCancerLegacyId, String Comment, int IsImage, int IsText) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_BCL_COMMENT_ID, BCLCommentId);
+            paramObject.put(Constants.WN_BREAST_CANCER_LEGACY_ID, BreastCancerLegacyId);
+            paramObject.put(Constants.WN_COMMENT, Comment);
+            paramObject.put(Constants.WN_IS_IMAGE, IsImage);
+            paramObject.put(Constants.WN_IS_TEXT, IsText);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    public JSONObject getUpdateProfileJson(String CategoryIds, String ProfilePicBase64String, String Email, String UserName, String ProfilePicUrl, String FirstName, String CustomerId, String BioVideoBase64String, String CategoryNames, String AboutSelf, String LastName, String City, String Website) {
+        JSONObject paramObject = new JSONObject();
+        try {
+
+            paramObject.put(Constants.WN_CUSTOMER, getUserUpdateDetails(CategoryIds, ProfilePicBase64String, Email, UserName, ProfilePicUrl, FirstName, CustomerId, BioVideoBase64String, CategoryNames, AboutSelf, LastName, City, Website));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    private JSONObject getUserUpdateDetails(String CategoryIds, String ProfilePicBase64String, String Email, String UserName, String ProfilePicUrl, String FirstName, String CustomerId, String BioVideoBase64String, String CategoryNames, String AboutSelf, String LastName, String City, String Website) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_CATEGORY_IDS, CategoryIds);
+            paramObject.put(Constants.WN_PROFILE_PIC, ProfilePicBase64String);
+            paramObject.put(Constants.WN_EMAIL, Email);
+            paramObject.put(Constants.WN_USERNAME, UserName);
+            paramObject.put(Constants.WN_PROFILE_PIC_URL, ProfilePicUrl);
+            paramObject.put(Constants.WN_FIRST_NAME, FirstName);
+            paramObject.put(Constants.WN_CUSTOMER_ID, CustomerId);
+            paramObject.put(Constants.WN_BIO_VIDEO, BioVideoBase64String);
+            paramObject.put(Constants.WN_CATEGORY_NAMES, CategoryNames);
+            paramObject.put(Constants.WN_ABOUT_SELF, AboutSelf);
+            paramObject.put(Constants.WN_LAST_NAME, LastName);
+            paramObject.put(Constants.WN_CITY, City);
+            paramObject.put(Constants.WN_WEBSITE, Website);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getSearchKeywordJson(String searchKeyWord) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_SearchKeyWord, searchKeyWord);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+
+    public JSONObject getResetPasswordJson(String newPassword) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_CUSTOMER_PASSWORD, getNewPassword(newPassword));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    private JSONObject getNewPassword(String newPassword) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_NEW_PASSWORD, newPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getShareVideoJson(String caption, int isVideo, int isImage, int isVideoGroup, String postUrl, String location,
+                                        float latitude, float longitude, String customerId, String username, int postWidth, int postHeight) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_SHARED_VIDEO_CAPTION, caption);
+            jsonObject.put(Constants.WN_IS_VIDEO, isVideo);
+            jsonObject.put(Constants.WN_IS_IMAGE, isImage);
+            jsonObject.put(Constants.WN_IS_VIDEO_GROUP, isVideoGroup);
+            jsonObject.put(Constants.WN_POST_URL, postUrl);
+            jsonObject.put(Constants.WN_LOCATION, location);
+            jsonObject.put(Constants.WN_LATITUDE, latitude);
+            jsonObject.put(Constants.WN_LONGITUDE, longitude);
+            jsonObject.put(Constants.WN_CUSTOMER_ID, customerId);
+            jsonObject.put(Constants.WN_USERNAME, username);
+            jsonObject.put(Constants.WN_POST_HEIGHT, postHeight);
+            jsonObject.put(Constants.WN_POST_WIDTH, postWidth);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getUploadPictureJson(String caption, int isVideo, int isImage, int isVideoGroup, String postUrl, String location,
+                                           float latitude, float longitude, String customerId, int postWidth, int postHeight,
+                                           List<TagListModel> tagListModels) {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put(Constants.WN_SHARED_VIDEO_CAPTION, caption);
+            jsonObject.put(Constants.WN_IS_VIDEO, isVideo);
+            jsonObject.put(Constants.WN_IS_IMAGE, isImage);
+            jsonObject.put(Constants.WN_IS_VIDEO_GROUP, isVideoGroup);
+            jsonObject.put(Constants.WN_POST_URL, postUrl);
+            jsonObject.put(Constants.WN_LOCATION, location);
+            jsonObject.put(Constants.WN_LATITUDE, latitude);
+            jsonObject.put(Constants.WN_LONGITUDE, longitude);
+            jsonObject.put(Constants.WN_CUSTOMER_ID, customerId);
+            jsonObject.put(Constants.WN_POST_HEIGHT, postHeight);
+            jsonObject.put(Constants.WN_POST_WIDTH, postWidth);
+
+            jsonObject.put(Constants.WN_POST_TAG_LIST, getTagData(tagListModels));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    private JSONArray getTagData(List<TagListModel> tagListModels) {
+        JSONArray jsonArray = new JSONArray();
+        try {
+            for (int i = 0; i < tagListModels.size(); i++) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Constants.WN_USERNAME, tagListModels.get(i).getUsername());
+                jsonObject.put(Constants.WN_X, tagListModels.get(i).getXcordinate());
+                jsonObject.put(Constants.WN_Y, tagListModels.get(i).getYcordinate());
+                jsonArray.put(jsonObject);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonArray;
+    }
+
+
+    public JSONObject getGroupVideoNotification(int PostId, int InvitedByCustomerID,
+                                                List<GroupListModel.UserList> userLists) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_GROUP_VIDEO_NOTIFICATION, getGroupVideoNotificationDetails(PostId, InvitedByCustomerID, userLists));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+
+    private JSONObject getGroupVideoNotificationDetails(int postId, int invitedByCustomerID, List<GroupListModel.UserList> userLists) {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        try {
+            jsonObject.put(Constants.WN_GROUP_POST_ID, postId);
+            jsonObject.put(Constants.WN_INVITED_BY_CUSTOMER_ID, invitedByCustomerID);
+            for (int i = 0; i < userLists.size(); i++) {
+                jsonArray.put(userLists.get(i).getCustomerId());
+            }
+            jsonObject.put(Constants.WN_GROUP_CUSTOMER_ID, jsonArray);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getSearchFollowerFollowingJson(String SearchKeyWord) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_SEARCH_KEY_WORD, SearchKeyWord);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+
+    public JSONObject getUpdateGroupNotification(String PostId, String CustomerId,
+                                                 String ActionUserId, String IsRequest) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_GROUP_VIDEO_REQUEST,
+                    getUpdateGroupNotificationDetails(PostId, CustomerId, ActionUserId, IsRequest));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject;
+    }
+
+    private JSONObject getUpdateGroupNotificationDetails(String postId, String customerId, String actionUserId, String isRequest) {
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put(Constants.WN_POST_ID, postId);
+            paramObject.put(Constants.WN_CUSTOMER_ID, customerId);
+            paramObject.put(Constants.WN_ACTIONUSER_ID, actionUserId);
+            paramObject.put(Constants.WN_IS_REQUEST, isRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paramObject;
+    }
+
+    public JSONObject getUploadGroupPostJson(String PostWidth, String Latitude, String VimeoVideoId, Integer PostID,
+                                             String PostHeight, String Caption, String Longitude, String Location,
+                                             String CustomerId, String PostTagList, String PostUrl) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_POST_WIDTH, PostWidth);
+            jsonObject.put(Constants.WN_LATITUDE, Latitude);
+            jsonObject.put(Constants.WN_VIMEOVIDEO_ID, VimeoVideoId);
+            jsonObject.put(Constants.WN_GROUP_POST_ID, PostID);
+            jsonObject.put(Constants.WN_POST_HEIGHT, PostHeight);
+            jsonObject.put(Constants.WN_SHARED_VIDEO_CAPTION, Caption);
+            jsonObject.put(Constants.WN_LONGITUDE, Longitude);
+            jsonObject.put(Constants.WN_LOCATION, Location);
+            jsonObject.put(Constants.WN_CUSTOMER_ID, CustomerId);
+            jsonObject.put(Constants.WN_POST_TAG_LIST, PostTagList);
+            jsonObject.put(Constants.WN_POST_URL, PostUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getUpdateGroupRequestUser(String PostId, String CustomerId, String ActionUserId, String NewCustomerId) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_GROUP_VIDEO_REQUEST,
+                    getUpdateUserInGroupVideo(PostId, CustomerId, ActionUserId, NewCustomerId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject;
+    }
+
+    private JSONObject getUpdateUserInGroupVideo(String postID, String customerId, String actionUserId, String newCustomerId) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Constants.WN_POST_ID, postID);
+            jsonObject.put(Constants.WN_CUSTOMER_ID, customerId);
+            jsonObject.put(Constants.WN_ACTIONUSER_ID, actionUserId);
+            jsonObject.put(Constants.WN_NEW_CUSTOMER_ID, newCustomerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+}

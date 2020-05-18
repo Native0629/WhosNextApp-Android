@@ -1,0 +1,506 @@
+package com.app.whosnextapp.breastCancerLegacies;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.BuildConstants;
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.APIService;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.ProgressRequestBody;
+import com.app.whosnextapp.apis.ProgressUtil;
+import com.app.whosnextapp.apis.RetrofitClient;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.bumptech.glide.Glide;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import pl.aprilapps.easyphotopicker.DefaultCallback;
+import pl.aprilapps.easyphotopicker.EasyImage;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class AddNewActivity extends BaseAppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, CompoundButton.OnCheckedChangeListener, ProgressRequestBody.UploadCallbacks {
+
+    final Calendar c = Calendar.getInstance();
+    final Calendar c2 = Calendar.getInstance();
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.rd_carnation)
+    RadioGroup rd_carnation;
+    @BindView(R.id.checkbox)
+    AppCompatCheckBox checkbox;
+    @BindView(R.id.iv_upload)
+    AppCompatImageView iv_upload;
+    @BindView(R.id.ll_radio)
+    LinearLayout ll_radio;
+    @BindView(R.id.rd_flower1)
+    RadioButton rd_flower1;
+    @BindView(R.id.rd_flower2)
+    RadioButton rd_flower2;
+    @BindView(R.id.rd_flower3)
+    RadioButton rd_flower3;
+    @BindView(R.id.ll_textView)
+    LinearLayout ll_tv;
+    @BindView(R.id.ll_editText)
+    LinearLayout ll_et;
+    @BindView(R.id.tv_date_of_birth)
+    AppCompatTextView tv_date_of_birth;
+    @BindView(R.id.tv_passing_year)
+    AppCompatTextView tv_passing_year;
+    @BindView(R.id.et_dob)
+    AppCompatEditText et_dob;
+    @BindView(R.id.et_passing)
+    AppCompatEditText et_passing;
+    @BindView(R.id.view)
+    View view;
+    @BindView(R.id.et_name)
+    AppCompatEditText et_name;
+    @BindView(R.id.et_description)
+    AppCompatEditText et_description;
+    @BindView(R.id.iv_camera)
+    AppCompatImageView iv_camera;
+
+    String imagePath;
+    Globals globals;
+    DatePickerDialog datePickerDialog;
+    private ACProgressFlower dialog;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_new);
+        init();
+    }
+
+    private Activity getActivity() {
+        return AddNewActivity.this;
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        dialog = ProgressUtil.initProgressBar(getActivity());
+        setActionbar();
+        checkbox.setOnCheckedChangeListener(this);
+        rd_carnation.setOnCheckedChangeListener(this);
+        et_dob.setOnClickListener(this);
+        et_passing.setOnClickListener(this);
+        if (getIntent().getStringExtra(Constants.WN_POST_ID) != null) {
+            setData();
+        }
+
+    }
+
+    public void setActionbar() {
+        toolbar.setBackgroundResource(R.color.pink);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar_title.setText(getString(R.string.text_add_new));
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    private void setData() {
+        iv_camera.setVisibility(View.GONE);
+
+        imagePath = getIntent().getStringExtra(Constants.WN_PICTURE_PATH);
+
+        Glide.with(AddNewActivity.this)
+                .load(getIntent().getStringExtra(Constants.WN_PICTURE_PATH))
+                .into(iv_upload);
+
+        et_name.setText(getIntent().getStringExtra(Constants.WN_NAME));
+        et_description.setText(getIntent().getStringExtra(Constants.WN_DESCRIPTION));
+
+
+        if (getIntent().getBooleanExtra(Constants.WN_IS_WHITE_CARNATION, false)
+                || getIntent().getBooleanExtra(Constants.WN_IS_PINK_WHITE_CARNATION, false)
+                || getIntent().getBooleanExtra(Constants.WN_IS_STRIPED_CARNATION, false)) {
+            checkbox.setChecked(true);
+            ll_tv.setVisibility(View.VISIBLE);
+            ll_et.setVisibility(View.VISIBLE);
+            ll_radio.setVisibility(View.VISIBLE);
+            rd_flower1.setChecked(getIntent().getBooleanExtra(Constants.WN_IS_WHITE_CARNATION, false));
+            rd_flower2.setChecked(getIntent().getBooleanExtra(Constants.WN_IS_PINK_WHITE_CARNATION, false));
+            rd_flower3.setChecked(getIntent().getBooleanExtra(Constants.WN_IS_STRIPED_CARNATION, false));
+            et_dob.setText(getIntent().getStringExtra(Constants.WN_DOB));
+            et_passing.setText(getIntent().getStringExtra(Constants.WN_DOP));
+        } else {
+            checkbox.setChecked(false);
+            ll_tv.setVisibility(View.GONE);
+            ll_et.setVisibility(View.GONE);
+            ll_radio.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick(R.id.tv_submit)
+    public void OnSubmitButtonClick() {
+        if (isValid()) {
+            if (getIntent().getStringExtra(Constants.WN_POST_ID) != null) {
+                dialog.show();
+                doRequestForEditBreastCancerLegacy();
+            } else {
+                dialog.show();
+                doRequestForSubmitBreastCancerLegacy();
+            }
+        }
+    }
+
+    @OnClick(R.id.iv_upload)
+    public void OnImageClick() {
+        getPermissionForImage();
+    }
+
+    private void showDialog() {
+        CharSequence[] options = new CharSequence[]{getResources().getString(R.string.take_from_camera), getResources().getString(R.string.select_from_library)};
+        globals.show_dialog(this, getString(R.string.text_browse_image), "", options, true, new Globals.OptionDialogClickHanderListener() {
+            @Override
+            public void OnItemClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        openCamera();
+                        break;
+                    case 1:
+                        openGallery();
+                        break;
+                }
+            }
+        });
+    }
+
+
+    private void openCamera() {
+        EasyImage.openCameraForImage(AddNewActivity.this, 0);
+    }
+
+    private void openGallery() {
+        EasyImage.openGallery(AddNewActivity.this, 0);
+    }
+
+    private void getPermissionForImage() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                showDialog();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Globals.showToast(AddNewActivity.this, getString(R.string.permission_denied) + deniedPermissions.toString());
+            }
+        };
+        TedPermission.with(AddNewActivity.this)
+                .setPermissionListener(permissionlistener)
+                .setRationaleMessage(getString(R.string.request_camera_permission))
+                .setDeniedMessage(getString(R.string.on_denied_permission))
+                .setGotoSettingButtonText(getString(R.string.setting))
+                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .check();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        EasyImage.handleActivityResult(requestCode, resultCode, data, getActivity(), new DefaultCallback() {
+            @Override
+            public void onImagesPicked(@NonNull List<File> imageFiles, EasyImage.ImageSource source, int type) {
+                iv_camera.setVisibility(View.GONE);
+                if (!imageFiles.isEmpty()) {
+                    imagePath = imageFiles.get(0).getPath();
+                    Glide.with(getActivity())
+                            .load(imagePath)
+                            .into(iv_upload);
+                }
+            }
+
+            @Override
+            public void onCanceled(EasyImage.ImageSource source, int type) {
+                if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
+                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(getActivity());
+                    if (photoFile != null) {
+                        photoFile.delete();
+                    }
+                }
+            }
+        });
+
+    }
+
+    public String getType() {
+        if (rd_flower1.isChecked())
+            return "1";
+        else if (rd_flower2.isChecked())
+            return "2";
+        else if (rd_flower3.isChecked())
+            return "3";
+        return "0";
+    }
+
+    // Edit BCL Post
+
+    public void doRequestForEditBreastCancerLegacy() {
+        MultipartBody.Part body = null;
+        APIService mApiService = RetrofitClient.getClient(BuildConstants.BASE_URL).create(APIService.class);
+        if (!imagePath.isEmpty() && new File(imagePath).exists()) {
+            File selected_image = new File(imagePath);
+            ProgressRequestBody requestFile = new ProgressRequestBody(selected_image, Constants.WN_MEDIA_TYPE_IMAGE, this);
+            body = MultipartBody.Part.createFormData(Constants.WN_BCL_IMAGE, selected_image.getName(), requestFile);
+
+        }
+        try {
+            String bclId = getIntent().getStringExtra(Constants.WN_BREAST_CANCER_LEGACY_ID);
+            final String requestURL = getString(R.string.edit_bcl_post);
+            Call<LikeUnlikePostModel> call;
+            if (body != null) {
+
+                call = mApiService.GetAddBCLPost(globals.getUserDetails().getStatus().getUserId(), requestURL, body, RequestBody.create(MultipartBody.FORM, (
+                        HttpRequestHandler.getInstance()
+                                .getEditBreastCancerLegacy(et_dob.getText().toString(), bclId, Constants.WN_BCL_WIDTH, getType(),
+                                        "", Constants.WN_BCL_HEIGHT_, et_name.getText().toString(), et_description.getText().toString(),
+                                        et_passing.getText().toString()).toString())));
+
+
+            } else {
+                call = mApiService.GetEditBCLPost(globals.getUserDetails().getStatus().getUserId(), requestURL, RequestBody.create(MultipartBody.FORM, (
+                        HttpRequestHandler.getInstance()
+                                .getEditBreastCancerLegacy(et_dob.getText().toString(), bclId, Constants.WN_BCL_WIDTH, getType(),
+                                        "", Constants.WN_BCL_HEIGHT_, et_name.getText().toString(), et_description.getText().toString(),
+                                        et_passing.getText().toString()).toString())));
+
+            }
+
+
+            call.enqueue(new Callback<LikeUnlikePostModel>() {
+                @Override
+                public void onResponse(Call<LikeUnlikePostModel> call, Response<LikeUnlikePostModel> response) {
+                    LikeUnlikePostModel likeUnlikePostModel = response.body();
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        Intent intent = new Intent(AddNewActivity.this, HomePageActivity.class);
+                        intent.putExtra(Constants.WN_START_FRAGMENT, Constants.WN_BREAST_CANCER_LEGACIES);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<LikeUnlikePostModel> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //Create New BCL Post
+
+    public void doRequestForSubmitBreastCancerLegacy() {
+
+        APIService mApiService = RetrofitClient.getClient(BuildConstants.BASE_URL).create(APIService.class);
+        File selected_image = new File(imagePath);
+
+        ProgressRequestBody requestFile = new ProgressRequestBody(selected_image, Constants.WN_MEDIA_TYPE_IMAGE, this);
+        MultipartBody.Part body = MultipartBody.Part.createFormData(Constants.WN_BCL_IMAGE, selected_image.getName(), requestFile);
+
+        try {
+
+            String requestURL = String.format(getString(R.string.add_new_breast_cancer_legacy));
+            Call<LikeUnlikePostModel> call = mApiService.GetAddBCLPost(globals.getUserDetails().getStatus().getUserId(), requestURL, body, RequestBody.create(MultipartBody.FORM, (
+                    HttpRequestHandler.getInstance()
+                            .getAddNewBreastCancerLegacy(et_dob.getText().toString(), Constants.WN_BCL_WIDTH, getType(), "", Constants.WN_BCL_HEIGHT_, et_name.getText().toString(), et_description.getText().toString(), et_passing.getText().toString()).toString())));
+            call.enqueue(new Callback<LikeUnlikePostModel>() {
+                @Override
+                public void onResponse(Call<LikeUnlikePostModel> call, Response<LikeUnlikePostModel> response) {
+                    LikeUnlikePostModel likeUnlikePostModel = response.body();
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        Intent intent = new Intent(AddNewActivity.this, HomePageActivity.class);
+                        intent.putExtra(Constants.WN_START_FRAGMENT, Constants.WN_BREAST_CANCER_LEGACIES);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<LikeUnlikePostModel> call, Throwable t) {
+
+                }
+            });
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_page_menu, menu);
+        menu.findItem(R.id.header_bell).setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.header_bell) {
+            startActivity(new Intent(this, NotificationActivity.class));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.et_dob:
+                showDatePickerDialogForBirthDate();
+                break;
+            case R.id.et_passing:
+                showDatePickerDialogForPassingDate();
+                break;
+        }
+    }
+
+    public void showDatePickerDialogForBirthDate() {
+        int mYear = c2.get(Calendar.YEAR);
+        int mMonth = c2.get(Calendar.MONTH);
+        int mDay = c2.get(Calendar.DAY_OF_MONTH);
+        datePickerDialog = new DatePickerDialog(AddNewActivity.this,
+                (view, year, monthOfYear, dayOfMonth) -> {
+                    c2.set(year, monthOfYear, dayOfMonth);
+                    SimpleDateFormat format = new SimpleDateFormat(Constants.WN_DD_MM_YY);
+                    String dateString = format.format(c2.getTime());
+                    et_dob.setText(dateString);
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
+    }
+
+    public void showDatePickerDialogForPassingDate() {
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+        datePickerDialog = new DatePickerDialog(AddNewActivity.this,
+                (view, year, monthOfYear, dayOfMonth) -> {
+                    c.set(year, monthOfYear, dayOfMonth);
+                    SimpleDateFormat format = new SimpleDateFormat(Constants.WN_DD_MM_YY);
+                    String dateString = format.format(c.getTime());
+                    et_passing.setText(dateString);
+                }, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(c2.getTimeInMillis());
+        datePickerDialog.show();
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId) {
+            case R.id.rd_flower1:
+                if (rd_flower1.isChecked()) {
+                    ll_tv.setVisibility(View.GONE);
+                    ll_et.setVisibility(View.GONE);
+                }
+                break;
+            case R.id.rd_flower2:
+                if (rd_flower2.isChecked()) {
+                    ll_tv.setVisibility(View.GONE);
+                    ll_et.setVisibility(View.GONE);
+                }
+                break;
+            case R.id.rd_flower3:
+                if (rd_flower3.isChecked()) {
+                    ll_tv.setVisibility(View.VISIBLE);
+                    ll_et.setVisibility(View.VISIBLE);
+                    tv_date_of_birth.setVisibility(View.VISIBLE);
+                    tv_passing_year.setVisibility(View.VISIBLE);
+                    et_dob.setVisibility(View.VISIBLE);
+                    et_passing.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            ll_radio.setVisibility(View.VISIBLE);
+        } else {
+            ll_radio.setVisibility(View.GONE);
+            ll_tv.setVisibility(View.GONE);
+            ll_et.setVisibility(View.GONE);
+            view.setVisibility(View.GONE);
+        }
+    }
+
+
+    @Override
+    public void onProgressUpdate(int percentage) {
+    }
+
+    @Override
+    public void onError() {
+    }
+
+    @Override
+    public void onFinish() {
+    }
+
+    private boolean isValid() {
+        if (imagePath == null) {
+            Globals.showToast(this, getString(R.string.text_Please_upload_image));
+            return false;
+        }
+        if (et_name.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_type_name));
+            return false;
+        }
+        if (et_description.getText().toString().trim().isEmpty()) {
+            Globals.showToast(this, getString(R.string.err_empty_description));
+            return false;
+        }
+        return true;
+    }
+}

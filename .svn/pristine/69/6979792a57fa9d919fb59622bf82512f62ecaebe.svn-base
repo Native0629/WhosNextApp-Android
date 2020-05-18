@@ -1,0 +1,15 @@
+package com.app.whosnextapp.messaging.quickblox.utils;
+
+
+public enum State {
+    SENT(0),
+    DELIVERED(1),
+    READ(2),
+    NOSTATE(-1);
+
+    private int code;
+
+    State(int code) {
+        this.code = code;
+    }
+}

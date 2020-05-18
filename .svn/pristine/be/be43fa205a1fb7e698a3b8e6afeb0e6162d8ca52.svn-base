@@ -1,0 +1,9 @@
+package com.app.whosnextapp.videocall.utils;
+
+
+public interface IncomeCallFragmentCallbackListener {
+
+    void onAcceptCurrentSession();
+
+    void onRejectCurrentSession();
+}

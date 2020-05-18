@@ -1,0 +1,19 @@
+package com.app.whosnextapp.model;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class ChangePasswordModel implements Serializable {
+
+    @SerializedName("Result")
+    private String Result;
+
+    public String getResult() {
+        return Result;
+    }
+
+    public void setResult(String Result) {
+        this.Result = Result;
+    }
+}

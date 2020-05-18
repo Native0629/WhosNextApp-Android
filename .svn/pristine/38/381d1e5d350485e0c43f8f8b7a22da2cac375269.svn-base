@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dim_5"
+                android:paddingBottom="@dimen/dim_5">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="@dimen/dim_50"
+                    android:layout_height="@dimen/dim_50"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/dim_10"
+                    app:civ_border_color="@android:color/transparent"
+                    app:civ_border_width="@dimen/dim_3" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:fontFamily="@font/robotobold"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/dim_13"
+                    android:layout_height="@dimen/dim_13"
+                    android:layout_gravity="center"
+                    android:src="@drawable/start" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="@dimen/dim_10"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="end"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_20" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/fl_select_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/ll_likes"
+                app:layout_constraintDimensionRatio="H,4:5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ll_top_bar">
+
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/exoplayer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:minHeight="@dimen/dim_300"
+                android:visibility="visible"
+                app:shutter_background_color="@color/light_gray"
+                app:use_controller="false" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_selectImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/dim_350"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_volume"
+                    android:layout_width="@dimen/dim_30"
+                    android:layout_height="@dimen/dim_25"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/dim_10"
+                    android:scaleType="centerCrop"/>
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dim_15"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/btn_likes"
+                    android:layout_width="@dimen/dim_40"
+                    android:layout_height="@dimen/dim_40"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:button="@drawable/like_button_state" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_likeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:fontFamily="@font/robotoregular"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_likes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:fontFamily="@font/robotobold"
+                    android:text="@string/likes"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20"
+                    app:fontFamily="@font/robotoregular" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_mike"
+                    android:layout_width="@dimen/dim_40"
+                    android:layout_height="@dimen/dim_40"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:src="@drawable/mikered" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_shared"
+                    android:layout_width="@dimen/dim_40"
+                    android:layout_height="@dimen/dim_40"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:src="@drawable/sharered" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_total_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/dim_15"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_18" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_option"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/dim_8"
+                    android:gravity="center"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/dot" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/pro_image"
+                    android:layout_width="@dimen/dim_50"
+                    android:layout_height="@dimen/dim_50"
+                    android:layout_marginStart="@dimen/dim_10"
+                    app:civ_border_color="@android:color/transparent"
+                    app:civ_border_width="@dimen/dim_3" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_name"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:fontFamily="@font/robotoregular"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_20" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lin_viewAllComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_view_all_comments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_50"
+                    android:fontFamily="@font/robotobold"
+                    android:text="@string/view_all_comments"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_18"
+                    app:fontFamily="@font/ayearwithoutrain" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_pictures"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_60" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dim_10"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_addComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_50"
+                    android:fontFamily="@font/robotobold"
+                    android:text="@string/add_a_comment"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_18"
+                    app:fontFamily="@font/ayearwithoutrain" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

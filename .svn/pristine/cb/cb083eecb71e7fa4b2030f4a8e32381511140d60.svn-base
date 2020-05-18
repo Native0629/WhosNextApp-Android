@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_discover_people_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/ll_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_8"
+            android:layout_marginTop="@dimen/dim_3"
+            android:layout_marginEnd="@dimen/dim_8"
+            android:layout_marginBottom="@dimen/dim_3"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAllCaps="false"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_size_20" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_8"
+            android:layout_marginTop="@dimen/dim_3"
+            android:layout_marginEnd="@dimen/dim_8"
+            android:layout_marginBottom="@dimen/dim_2"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAllCaps="false"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_15" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_last_message_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_8"
+            android:layout_marginTop="@dimen/dim_2"
+            android:layout_marginEnd="@dimen/dim_8"
+            android:layout_marginBottom="@dimen/dim_3"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAllCaps="false"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_12" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="@dimen/dim_8"
+        android:layout_weight="0"
+        android:minWidth="@dimen/dim_55"
+        android:minHeight="@dimen/dim_65"
+        android:scaleType="centerCrop" />
+</LinearLayout>
+

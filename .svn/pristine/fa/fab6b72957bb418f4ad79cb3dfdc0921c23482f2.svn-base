@@ -1,0 +1,95 @@
+package com.app.whosnextapp.drawer;
+
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.AppCompatTextView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.app.whosnextapp.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class PicturesFragment extends Fragment {
+    @BindView(R.id.tv_pictures)
+    AppCompatTextView tv_pictures;
+    @BindView(R.id.tv_pictures_of_you)
+    AppCompatTextView tv_pictures_of_you;
+    @BindView(R.id.viewpager)
+    ViewPager viewpager;
+    public View v;
+    PagerAdapter adapter;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        if(v == null) {
+            v = inflater.inflate(R.layout.fragment_pictures, container, false);
+            ButterKnife.bind(this, v);
+            if(getActivity()!=null) {
+                viewpager.setAdapter(new PagerAdapter(getActivity().getSupportFragmentManager()));
+            }
+            tv_pictures.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewpager.setCurrentItem(0);
+                }
+            });
+
+            tv_pictures_of_you.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewpager.setCurrentItem(1);
+                }
+            });
+
+            viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int i, float v, int i1) {
+
+                }
+
+                @Override
+                public void onPageSelected(int i) {
+
+                    onChangeTab(i);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int i) {
+
+                }
+            });
+        }
+        return v;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    private void onChangeTab(int i) {
+
+        if(i==0)
+        {
+            tv_pictures.setTextColor(getResources().getColor(R.color.red));
+            tv_pictures_of_you.setTextColor(getResources().getColor(R.color.black));
+        }
+        if(i==1)
+        {
+            tv_pictures.setTextColor(getResources().getColor(R.color.black));
+            tv_pictures_of_you.setTextColor(getResources().getColor(R.color.red));
+        }
+    }
+
+}

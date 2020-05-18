@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".settings.SubscribeActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:text="@string/subscription_for_ads"
+                android:textAllCaps="true"
+                android:textSize="@dimen/text_size_20" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/dim_5"
+                android:layout_marginRight="@dimen/dim_5"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dim_5"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/ll_sub_150"
+                        android:layout_width="@dimen/dim_180"
+                        android:layout_height="@dimen/dim_200"
+                        android:layout_gravity="center"
+                        android:background="@drawable/shape_subscribe"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        tools:ignore="KeyboardInaccessibleWidget">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/text_subscribe"
+                            android:textAllCaps="true"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_150"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/_150"
+                            android:textAllCaps="true"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_permonth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/per_month"
+                            android:textAllCaps="true"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_18" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dim_20"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/ads_on_dashboard"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/page"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dim_15"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/_2_ads_per_month"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dim_5"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/ll_sub_250"
+                        android:layout_width="@dimen/dim_180"
+                        android:layout_height="@dimen/dim_200"
+                        android:layout_gravity="center"
+                        android:background="@drawable/shap_subscribe_gray"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_250"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/text_subscribe"
+                            android:textAllCaps="true"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/s2_250"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/_250"
+                            android:textAllCaps="true"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/s3_per_month2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/ayearwithoutrain"
+                            android:gravity="center"
+                            android:text="@string/per_month"
+                            android:textAllCaps="true"
+                            android:textSize="@dimen/text_size_18" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dim_20"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/ads_on"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/dashboard_page"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/and"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/featured_profile_page"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dim_15"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/dashboard_3_ads"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/per_month"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/featured_profile_1_ad"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ayearwithoutrain"
+                        android:gravity="center"
+                        android:text="@string/per_month"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_Pay_now"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dim_10"
+                android:background="@color/sky"
+                android:gravity="center"
+                android:padding="@dimen/dim_8">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center"
+                    android:text="@string/pay_now"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size_25" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dim_10"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:text="@string/terms_condition_1"
+                android:textAllCaps="true"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dim_10"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:text="@string/users_can_publish_ads"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,269 @@
+package com.app.whosnextapp.pictures;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.model.DiscoverModel;
+import com.app.whosnextapp.model.TagListModel;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class TagPeopleActivity extends BaseAppCompatActivity implements TextWatcher, AdapterView.OnItemClickListener {
+
+    @BindView(R.id.iv_tag_thumbnail)
+    ImageView iv_tag_thumbnail;
+    @BindView(R.id.fl_header)
+    FrameLayout fl_header;
+    @BindView(R.id.fl_search)
+    FrameLayout fl_search;
+    @BindView(R.id.fl_tag)
+    FrameLayout fl_tag;
+    @BindView(R.id.et_search_tag_people)
+    EditText et_search_tag_people;
+    @BindView(R.id.rv_tag_people)
+    RecyclerView rv_tag_people;
+
+    TagPeopleAdapter tagPeopleAdapter;
+    ArrayList<TagListModel> tagListModels = new ArrayList<>();
+    String camera_picture;
+    Globals globals;
+    PostRequest postRequest;
+    float x, y;
+    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+    private ArrayList<DiscoverModel.CustomerList> customerLists;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tag_people);
+        init();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+
+        if (getIntent().getExtras() != null) {
+            camera_picture = getIntent().getStringExtra(Constants.WN_PICTURE_PATH);
+            tagListModels = (ArrayList<TagListModel>) getIntent().getSerializableExtra(Constants.WN_POST_TAG_LIST);
+
+            /*Displaying tags (textview) programatically at particular screen location that comes from Arraylist*/
+            for (int i = 0; i < tagListModels.size(); i++) {
+                final TextView tv_tag = new TextView(this);
+                tv_tag.setLayoutParams(layoutParams);
+                tv_tag.setBackgroundColor(Color.BLACK);
+                tv_tag.setTextColor(Color.WHITE);
+                tv_tag.setTextSize(18);
+                tv_tag.setText(tagListModels.get(i).getUsername());
+                tv_tag.setX(tagListModels.get(i).getXcordinate());
+                tv_tag.setY(tagListModels.get(i).getYcordinate());
+                tv_tag.setTag(tagListModels.get(i).getUsername());
+                tv_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.close, 0);
+                tv_tag.setOnTouchListener((v, event) -> {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (event.getRawX() >= tv_tag.getRight() - tv_tag.getTotalPaddingRight()) {
+                            for (int i1 = 0; i1 < tagListModels.size(); i1++) {
+                                if (v.getTag().equals(tagListModels.get(i1).getUsername())) {
+                                    tagListModels.remove(tagListModels.get(i1));
+                                    break;
+                                }
+                            }
+                            fl_tag.removeView(v);
+                            return true;
+                        }
+                    }
+                    return true;
+                });
+                this.fl_tag.addView(tv_tag);
+
+            }
+        }
+        if (camera_picture != null) {
+            Glide.with(getApplicationContext())
+                    .load(camera_picture)
+                    .into(iv_tag_thumbnail);
+        }
+        getTouchCoordinate();
+        et_search_tag_people.addTextChangedListener(this);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void getTouchCoordinate() {
+        /*Creating default tag (textview) programmatically at particular screen location*/
+        iv_tag_thumbnail.setOnTouchListener((v, event) -> {
+            fl_header.setVisibility(View.GONE);
+            fl_search.setVisibility(View.VISIBLE);
+            x = event.getX();
+            y = event.getY();
+            final TextView tv_tag = new TextView(getApplicationContext());
+            tv_tag.setLayoutParams(layoutParams);
+            tv_tag.setBackgroundColor(Color.BLACK);
+            tv_tag.setTextColor(Color.WHITE);
+            tv_tag.setTextSize(18);
+            tv_tag.setText(getString(R.string.text_who_next));
+            tv_tag.setX(x);
+            tv_tag.setY(y);
+            tv_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.close, 0);
+            tv_tag.setOnTouchListener((v1, event1) -> {
+                if (event1.getAction() == MotionEvent.ACTION_UP) {
+                    if (event1.getRawX() >= tv_tag.getRight() - tv_tag.getTotalPaddingRight()) {
+                        fl_tag.removeView(v1);
+                        return true;
+                    }
+                }
+                return true;
+            });
+            fl_tag.addView(tv_tag);
+            et_search_tag_people.requestFocus();
+            showKeyboard();
+            return false;
+        });
+    }
+
+    public void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(et_search_tag_people, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    @OnClick(R.id.tv_cancel)
+    public void onCancelClick() {
+        onBackPressed();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        doRequestToSearchPeople();
+    }
+
+    private void doRequestToSearchPeople() {
+        JSONObject postData = HttpRequestHandler.getInstance()
+                .getSearchFollowerFollowingJson(et_search_tag_people.getText().toString());
+
+        postRequest = new PostRequest(this, postData, getString(R.string.get_search_follower_following_url), false, false, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                DiscoverModel discoverModel = new Gson().fromJson(response, DiscoverModel.class);
+                if (discoverModel != null && discoverModel.getCustomerList() != null) {
+                    rv_tag_people.setVisibility(View.VISIBLE);
+                    customerLists = discoverModel.getCustomerList();
+                    setDiscoverAdapter();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        });
+        try {
+            postRequest.cancelRequest();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        postRequest.execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void setDiscoverAdapter() {
+        if (tagPeopleAdapter == null) {
+            tagPeopleAdapter = new TagPeopleAdapter();
+            tagPeopleAdapter.setOnItemClickListener(this);
+        }
+        if (rv_tag_people.getAdapter() == null) {
+            rv_tag_people.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            rv_tag_people.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
+            rv_tag_people.setAdapter(tagPeopleAdapter);
+        }
+        tagPeopleAdapter.doRefresh(customerLists);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        fl_tag.removeViewAt(fl_tag.getChildCount() - 1);
+        if (tagPeopleAdapter != null) {
+            /*Creating textview programmatically at particular screen location*/
+            final TextView tv_tag = new TextView(this);
+            tv_tag.setLayoutParams(layoutParams);
+            tv_tag.setBackgroundColor(Color.BLACK);
+            tv_tag.setTextColor(Color.WHITE);
+            tv_tag.setTextSize(18);
+            tv_tag.setText(customerLists.get(position).getUserName());
+            tv_tag.setX(x);
+            tv_tag.setY(y);
+            tv_tag.setTag(customerLists.get(position).getUserName());
+            final TagListModel tagListModel = new TagListModel();
+            tagListModel.setUsername(customerLists.get(position).getUserName());
+            tagListModel.setXcordinate(x);
+            tagListModel.setYcordinate(y);
+            tagListModels.add(tagListModel);
+            tv_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.close, 0);
+            tv_tag.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= tv_tag.getRight() - tv_tag.getTotalPaddingRight()) {
+                        for (int i = 0; i < tagListModels.size(); i++) {
+                            if (v.getTag().equals(tagListModels.get(i).getUsername())) {
+                                tagListModels.remove(tagListModels.get(i));
+                                break;
+                            }
+                        }
+                        fl_tag.removeView(v);
+                        return true;
+                    }
+                }
+                return true;
+            });
+            this.fl_tag.addView(tv_tag);
+            rv_tag_people.setVisibility(View.GONE);
+            fl_header.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @OnClick(R.id.tv_done)
+    public void onDoneClick() {
+        Intent i = new Intent();
+        i.putExtra(Constants.WN_X, tagListModels);
+        setResult(RESULT_OK, i);
+        finish();
+    }
+}

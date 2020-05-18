@@ -1,0 +1,196 @@
+package com.app.whosnextapp.settings;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
+
+import org.json.JSONException;
+
+import java.math.BigDecimal;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class SubscribeActivity extends BaseAppCompatActivity implements View.OnClickListener {
+
+    public static final int PAY_PAL_REQUEST_CODE = 123;
+
+    private static PayPalConfiguration config = new PayPalConfiguration()
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId(Constants.PAY_PAL_CLIENT_ID);
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.tv_sub)
+    AppCompatTextView tv_sub;
+    @BindView(R.id.tv_150)
+    AppCompatTextView tv_150;
+    @BindView(R.id.tv_permonth)
+    AppCompatTextView tv_per_month;
+    @BindView(R.id.tv_250)
+    AppCompatTextView tv_250;
+    @BindView(R.id.s2_250)
+    AppCompatTextView s2_250;
+    @BindView(R.id.s3_per_month2)
+    AppCompatTextView s3_per_month2;
+    @BindView(R.id.ll_Pay_now)
+    LinearLayout ll_Pay_now;
+    @BindView(R.id.ll_sub_150)
+    LinearLayout ll_sub_150;
+    @BindView(R.id.ll_sub_250)
+    LinearLayout ll_sub_250;
+
+    Globals globals;
+    private String paymentAmount;
+    private String SubscriptionTypeId;
+
+    @Override
+    public void onDestroy() {
+        stopService(new Intent(this, PayPalService.class));
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_subscribe);
+        ButterKnife.bind(this);
+        init();
+    }
+
+    private void init() {
+        globals = (Globals) getApplicationContext();
+        setActionBar();
+
+        Intent intent = new Intent(this, PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        startService(intent);
+        ll_sub_150.setOnClickListener(this);
+        ll_sub_250.setOnClickListener(this);
+        ll_Pay_now.setOnClickListener(this);
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        toolbar_title.setText(R.string.text_subscribe);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    public void color_white_change(TextView... views) {
+        for (TextView view : views) {
+            view.setTextColor(getResources().getColor(R.color.White));
+        }
+    }
+
+    public void color_black_change(TextView... views) {
+        for (TextView view : views) {
+            view.setTextColor(getResources().getColor(R.color.black));
+        }
+    }
+
+    private void getPayment() {
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(String.valueOf(paymentAmount)), getString(R.string.usd), getString(R.string.subscription_for_ads),
+                PayPalPayment.PAYMENT_INTENT_SALE);
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+        startActivityForResult(intent, PAY_PAL_REQUEST_CODE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_page_menu, menu);
+        menu.findItem(R.id.header_bell).setVisible(true);
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PAY_PAL_REQUEST_CODE) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+
+                if (confirm != null) {
+                    try {
+                        String paymentDetails = confirm.toJSONObject().toString(4);
+                        Log.i(getString(R.string.payment_example), paymentDetails);
+
+                        startActivity(new Intent(this, ConfirmationActivity.class)
+                                .putExtra(Constants.WN_PAYMENT_DETAILS, paymentDetails)
+                                .putExtra(Constants.WN_SUBSCRIPTION_TYPE_ID, SubscriptionTypeId)
+                                .putExtra(Constants.WN_PAYMENT_AMOUNT, paymentAmount));
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Log.i(getString(R.string.payment_example), getString(R.string.text_user_cancel));
+            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+                Log.i(getString(R.string.payment_example), getString(R.string.text_invalid));
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ll_sub_150:
+                ll_sub_150.setBackground(getResources().getDrawable(R.drawable.shape_subscribe));
+                ll_sub_250.setBackground(getResources().getDrawable(R.drawable.shap_subscribe_gray));
+                color_white_change(tv_sub, tv_150, tv_per_month);
+                color_black_change(tv_250, s2_250, s3_per_month2);
+                paymentAmount = String.valueOf(150);
+                SubscriptionTypeId = "1";
+                break;
+
+            case R.id.ll_sub_250:
+                ll_sub_250.setBackground(getResources().getDrawable(R.drawable.shape_subscribe));
+                ll_sub_150.setBackground(getResources().getDrawable(R.drawable.shap_subscribe_gray));
+                color_white_change(tv_250, s2_250, s3_per_month2);
+                color_black_change(tv_sub, tv_150, tv_per_month);
+                paymentAmount = String.valueOf(250);
+                SubscriptionTypeId = "2";
+                break;
+
+            case R.id.ll_Pay_now:
+                if (paymentAmount == null) {
+                    paymentAmount = String.valueOf(150);
+                    SubscriptionTypeId = "1";
+                    getPayment();
+                } else {
+                    getPayment();
+                }
+                break;
+        }
+    }
+}
+

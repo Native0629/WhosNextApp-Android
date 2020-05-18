@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".breastCancerLegacies.AddNewActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:padding="@dimen/dim_10"
+                android:text="@string/text_add_picture"
+                android:textColor="@color/pink"
+                android:textSize="@dimen/text_size_20" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="274dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_upload"
+                    android:layout_width="match_parent"
+                    android:layout_height="274dp"
+                    android:background="@color/light_gray"
+                    android:scaleType="centerCrop" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_camera"
+                    android:layout_width="@dimen/dim_100"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:background="@color/light_gray"
+                    android:src="@drawable/cameraupload" />
+
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:padding="@dimen/dim_10"
+                android:text="@string/text_add_name"
+                android:textColor="@color/pink"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/robotoregular"
+                android:hint="@string/please_type_name"
+                android:padding="@dimen/dim_10"
+                android:singleLine="true"
+                android:textColor="@color/gray"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_vertical"
+                android:padding="@dimen/dim_10"
+                android:text="@string/text_add_description"
+                android:textColor="@color/pink"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:fontFamily="@font/robotoregular"
+                android:gravity="top"
+                android:hint="@string/please_type_description"
+                android:lines="4"
+                android:padding="@dimen/dim_10"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_18" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/dim_10">
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="@dimen/dim_30"
+                    android:layout_height="@dimen/dim_30"
+                    android:button="@drawable/checkbox"
+                    android:paddingStart="@dimen/dim_5"
+                    android:paddingLeft="@dimen/dim_5"
+                    android:textSize="@dimen/text_size_18"
+                    tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:paddingStart="@dimen/dim_5"
+                    android:paddingLeft="@dimen/dim_5"
+                    android:text="@string/add_carnation_during_upload"
+                    android:textColor="@color/pink"
+                    android:textSize="@dimen/text_size_18"
+                    tools:ignore="RtlHardcoded,RtlSymmetry" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_radio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_gray"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="@dimen/dim_30"
+                        android:layout_height="@dimen/dim_30"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/dim_7"
+                        android:layout_marginLeft="@dimen/dim_7"
+                        android:src="@drawable/flower1"
+                        app:civ_border_color="@android:color/transparent"
+                        app:civ_border_width="@dimen/dim_2"
+                        tools:ignore="RtlHardcoded" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="@dimen/dim_30"
+                        android:layout_height="@dimen/dim_30"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/dim_7"
+                        android:layout_marginLeft="@dimen/dim_7"
+                        android:src="@drawable/flower2"
+                        app:civ_border_color="@android:color/transparent"
+                        app:civ_border_width="@dimen/dim_2"
+                        tools:ignore="RtlHardcoded" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="@dimen/dim_30"
+                        android:layout_height="@dimen/dim_30"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/dim_7"
+                        android:layout_marginLeft="@dimen/dim_7"
+                        android:src="@drawable/flower3"
+                        app:civ_border_color="@android:color/transparent"
+                        app:civ_border_width="@dimen/dim_2"
+                        tools:ignore="RtlHardcoded" />
+                </LinearLayout>
+
+                <RadioGroup
+                    android:id="@+id/rd_carnation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/rd_flower1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/white_carnation" />
+
+                    <RadioButton
+                        android:id="@+id/rd_flower2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pink_and_white" />
+
+                    <RadioButton
+                        android:id="@+id/rd_flower3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/scrip_carnations" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dim_15" />
+
+            <LinearLayout
+                android:id="@+id/ll_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_date_of_birth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/dim_10"
+                    android:text="@string/date_of_birth"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_passing_year"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/dim_10"
+                    android:text="@string/date_of_passing"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_dob"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:focusable="false"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:hint="@string/mm_dd_yyyy"
+                    android:padding="@dimen/dim_10"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_passing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:focusable="false"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="center_vertical"
+                    android:hint="@string/mm_dd_yyyy"
+                    android:padding="@dimen/dim_10"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/sky"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:padding="@dimen/dim_10"
+                android:text="@string/submit"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+

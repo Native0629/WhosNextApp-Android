@@ -1,0 +1,671 @@
+package com.app.whosnextapp.drawer.homepage;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.drawer.HomePageActivity;
+import com.app.whosnextapp.drawer.NothingSelectedSpinnerAdapter;
+import com.app.whosnextapp.model.CategoryModel;
+import com.app.whosnextapp.model.GetAllDashboardData;
+import com.app.whosnextapp.model.LikeUnlikePostModel;
+import com.app.whosnextapp.navigationmenu.OtherUserProfileActivity;
+import com.app.whosnextapp.notification.NotificationActivity;
+import com.app.whosnextapp.notification.ProfileVideoPlayerActivity;
+import com.app.whosnextapp.pictures.CommentActivity;
+import com.app.whosnextapp.pictures.LikePostActivity;
+import com.app.whosnextapp.utility.BaseFragment;
+import com.app.whosnextapp.utility.ConstantEnum;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.paginate.Paginate;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import im.ene.toro.widget.Container;
+import im.ene.toro.widget.PressablePlayerSelector;
+
+public class MyFeedFragment extends BaseFragment implements ExoPlayerAdapter.OnItemClick, TextWatcher,
+        Paginate.Callbacks, AdapterView.OnItemSelectedListener {
+
+    @BindView(R.id.sp_category)
+    public Spinner sp_category;
+    @BindView(R.id.et_search_people)
+    public AppCompatEditText et_search_people;
+    /*Search*/
+    @BindView(R.id.ll_search_header)
+    LinearLayout ll_search_header;
+    @BindView(R.id.player_container)
+    Container container;
+    @BindView(R.id.tv_feed_not_found)
+    AppCompatTextView tv_feed_not_found;
+    TextView tv_noitfication_count;
+
+
+    private LinearLayoutManager layoutManager;
+    private ExoPlayerAdapter adapter;
+    private PressablePlayerSelector selector;
+    private Context mContext;
+    private Globals globals;
+    private int likeCount;
+    private int IsLike;
+    private int pageCount = 1;
+    private boolean loading = false;
+    private ArrayList<CategoryModel.CategoryList> categoryList = new ArrayList<>();
+    private GetAllDashboardData getAllDashboardData;
+    private ArrayList<GetAllDashboardData.DashboardList> dashboardListArrayList;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_my_feed, container, false);
+        ButterKnife.bind(this, v);
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        init();
+    }
+
+    private void init() {
+        globals = (Globals) mContext.getApplicationContext();
+        doRequestForDashboardData(true);
+        doRequestForCategory();
+        et_search_people.addTextChangedListener(this);
+    }
+
+    // Display all Category wise talented Person
+
+    private void doRequestForCategory() {
+        new PostRequest(getActivity(), null, getString(R.string.get_talent_category_url), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                CategoryModel categoryModel = new Gson().fromJson(response, CategoryModel.class);
+                if (categoryModel != null && categoryModel.getCategoryList() != null) {
+                    categoryList = categoryModel.getCategoryList();
+                    showListInSpinner();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(mContext, msg);
+            }
+        }).execute();
+    }
+
+    private void showListInSpinner() {
+        ArrayList<String> items = new ArrayList<>();
+        for (int i = 0; i < categoryList.size(); i++) {
+            items.add(categoryList.get(i).getCategoryName());
+        }
+        ArrayAdapter<String> adapter;
+        if (mContext != null) {
+            adapter = new ArrayAdapter<>(mContext, R.layout.category_spinner_item, items);
+            adapter.setDropDownViewResource(R.layout.category_spinner_item);
+            sp_category.setAdapter(new NothingSelectedSpinnerAdapter(adapter, R.layout.layout_nothing_selected_item_spinner, mContext));
+            sp_category.setOnItemSelectedListener(this);
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (position > 0) {
+            doRequestForSearchPeople(categoryList.get(position - 1).getCategoryId());
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @OnClick(R.id.tv_cancel_search)
+    public void cancelClick() {
+        pageCount = 1;
+        Globals.hideKeyboard(getActivity());
+        ll_search_header.setVisibility(View.GONE);
+        doRequestForDashboardData(true);
+    }
+
+    //Search Feed Post
+
+    private void doRequestForSearchPeople(Integer categoryId) {
+        JSONObject postData = HttpRequestHandler.getInstance().getDiscoverPeopleJson(1, categoryId, "");
+        new PostRequest(getActivity(), postData,
+                getString(R.string.get_search_in_post), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                getAllDashboardData = new Gson().fromJson(response, GetAllDashboardData.class);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    JSONArray jsonArray = object.getJSONArray(Constants.WN_SEARCH_LIST);
+
+                    Type collectionType = new TypeToken<Collection<GetAllDashboardData.DashboardList>>() {
+                    }.getType();
+                    Collection<GetAllDashboardData.DashboardList> enums = new Gson().fromJson(jsonArray.toString(), collectionType);
+
+                    ArrayList<GetAllDashboardData.DashboardList> dashboardLists = (ArrayList<GetAllDashboardData.DashboardList>) enums;
+
+                    getAllDashboardData.setDashboardList(dashboardLists);
+
+                    if (getAllDashboardData.getDashboardList() != null) {
+                        dashboardListArrayList.clear();
+                        dashboardListArrayList.addAll(getAllDashboardData.getDashboardList());
+                        setDashboardData();
+                    } else {
+                        dashboardListArrayList.clear();
+                        setDashboardData();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(mContext, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    // Display Dashboard Data
+
+    public void doRequestForDashboardData(boolean isLoaderRequired) {
+        Log.e(TAG, "doRequestForDashboardData: " + pageCount);
+        String requestURL = String.format(getString(R.string.get_all_dashboard_data), pageCount, 1);
+        new PostRequest(getActivity(), null, requestURL, isLoaderRequired, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                try {
+                    JSONObject object = new JSONObject(response);
+                    JSONObject obj = object.getJSONObject(Constants.WN_DASHBOARD_LIST);
+                    getAllDashboardData = new Gson().fromJson(obj.toString(), GetAllDashboardData.class);
+                    setNotification(0);
+                    if (getAllDashboardData != null) {
+                        setNotification(getAllDashboardData.getNotificationCount());
+                        if (dashboardListArrayList == null) {
+                            dashboardListArrayList = new ArrayList<>();
+                        }
+
+                        if (getAllDashboardData.getDashboardList() != null) {
+                            if (pageCount == 1 || dashboardListArrayList == null) {
+                                dashboardListArrayList = new ArrayList<>();
+                            }
+                            dashboardListArrayList.addAll(getAllDashboardData.getDashboardList());
+                            loading = false;
+                        }
+
+                        setDashboardData();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(mContext, msg);
+                if (pageCount == 0) {
+                    pageCount++;
+                }
+                loading = false;
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void setDashboardData() {
+        if (adapter == null) {
+            selector = new PressablePlayerSelector(container);
+            adapter = new ExoPlayerAdapter(getActivity(), mContext, getAllDashboardData.getSnippetsList(), selector, this);
+        }
+        ArrayList<GetAllDashboardData.DashboardList> temp = new ArrayList<>();
+
+        for (int i = 1; i < dashboardListArrayList.size() + 1; i++) {
+            temp.add(dashboardListArrayList.get(i - 1));
+            if (i != dashboardListArrayList.size() && i % 10 == 0) {
+                temp.add(null);
+            }
+        }
+        adapter.doRefresh(temp);
+
+        if (container.getAdapter() == null) {
+            container.setHasFixedSize(false);
+            layoutManager = new LinearLayoutManager(getActivity());
+            container.setLayoutManager(layoutManager);
+            container.setPlayerSelector(selector);
+            container.setAdapter(adapter);
+
+            if (dashboardListArrayList != null && dashboardListArrayList.size() > 0) {
+                if (dashboardListArrayList.size() < getAllDashboardData.getTotalPostCount()) {
+                    Paginate.with(container, this)
+                            .setLoadingTriggerThreshold(1)
+                            .addLoadingListItem(true)
+                            .setLoadingListItemCreator(new paginationProgressBarAdapter())
+                            .setLoadingListItemSpanSizeLookup(() -> 1)
+                            .build();
+                }
+            }
+        }
+        //}
+        // handleEmptyList();
+    }
+
+    public void handleEmptyList() {
+        loading = false;
+        if (dashboardListArrayList == null || dashboardListArrayList.isEmpty()) {
+            tv_feed_not_found.setVisibility(View.VISIBLE);
+            container.setVisibility(View.GONE);
+        } else {
+            tv_feed_not_found.setVisibility(View.GONE);
+            container.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onLoadMore() {
+
+        loading = true;
+        pageCount++;
+        doRequestForDashboardData(false);
+    }
+
+    @Override
+    public boolean isLoading() {
+        return loading;
+    }
+
+    @Override
+    public boolean hasLoadedAllItems() {
+        return dashboardListArrayList.size() >= getAllDashboardData.getTotalPostCount();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.home_page_menu, menu);
+        final MenuItem menuItem = menu.findItem(R.id.header_bell);
+        View actionView = MenuItemCompat.getActionView(menuItem);
+        tv_noitfication_count = actionView.findViewById(R.id.tv_noitfication_count);
+
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setNotification(int count) {
+        if (getActivity() instanceof HomePageActivity) {
+            Menu menu = ((HomePageActivity) getActivity()).getToolbar().getMenu();
+            if (menu != null) {
+                final MenuItem menuItem = menu.findItem(R.id.header_bell);
+                if (menuItem != null) {
+                    View actionView = MenuItemCompat.getActionView(menuItem);
+                    AppCompatTextView tv_noitfication_count = actionView.findViewById(R.id.tv_noitfication_count);
+                    if (tv_noitfication_count == null)
+                        return;
+                    if (count != 0) {
+                        String unreadCont = String.valueOf(count);
+                        if (count >= 100) {
+                            unreadCont = getString(R.string.text_bubble_nine_nine_plus);
+                        }
+                        tv_noitfication_count.setText(unreadCont);
+                        tv_noitfication_count.setBackground(Globals.getCircle(getActivity().getResources().getColor(R.color.sky), (int) getResources().getDimension(R.dimen.dim_1), getActivity().getResources().getColor(R.color.sky)));
+                        tv_noitfication_count.setTextColor(Color.WHITE);
+                        tv_noitfication_count.setVisibility(View.VISIBLE);
+
+                    } else {
+                        tv_noitfication_count.setVisibility(View.GONE);
+                    }
+//                    tv_noitfication_count.setVisibility(View.VISIBLE);
+//                    tv_noitfication_count.setOnClickListener(v -> startActivity(new Intent(getActivity(), NotificationActivity.class)));
+                }
+            }
+
+
+        }
+
+
+    }
+
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.header_bell).setVisible(true);
+        menu.findItem(R.id.header_search).setVisible(true);
+        menu.findItem(R.id.header_refresh).setVisible(true);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.header_refresh:
+                doRequestForDashboardData(true);
+                break;
+            case R.id.header_search:
+                if (ll_search_header.getVisibility() == View.VISIBLE) {
+                    ll_search_header.setVisibility(View.GONE);
+                } else {
+                    ll_search_header.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.header_bell:
+                startActivity(new Intent(getActivity(), NotificationActivity.class));
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        doRequestForDashboardData(false);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        layoutManager = null;
+        adapter = null;
+        selector = null;
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        layoutManager = null;
+        adapter = null;
+        selector = null;
+        super.onDestroyView();
+    }
+
+    private void navigateToUserProfile(int i) {
+        Intent intent = new Intent(getContext(), ProfileVideoPlayerActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardListArrayList.get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    private void navigateToComment(int i) {
+        Intent intent = new Intent(getContext(), CommentActivity.class);
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardListArrayList.get(i).getId()));
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardListArrayList.get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    private void navigateToOtherUserProfile(int i) {
+        Intent intent = new Intent(getContext(), OtherUserProfileActivity.class);
+        intent.putExtra(Constants.WN_CUSTOMER_ID, dashboardListArrayList.get(i).getCustomerId());
+        startActivity(intent);
+    }
+
+    /*Adapter Items ClickEvents*/
+    @Override
+    public void onClickProfile(int i) {
+        navigateToUserProfile(i);
+    }
+
+    @Override
+    public void onClickUsername(int i) {
+        navigateToOtherUserProfile(i);
+    }
+
+    @Override
+    public void onClickLike(GetAllDashboardData.DashboardList dashboardDataList, final int i) {
+        likeCount = dashboardListArrayList.get(i).getTotalLikes();
+        if (dashboardListArrayList.get(i).getIsLiked() && likeCount != 0) {
+            likeCount = likeCount - 1;
+            IsLike = 0;
+        } else {
+            likeCount = likeCount + 1;
+            IsLike = 1;
+        }
+
+        String requestURL = String.format(getString(R.string.like_unlike_post), String.valueOf(dashboardDataList.getId()), IsLike);
+
+        new PostRequest(getActivity(), null, requestURL, false, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel != null) {
+                    if (likeUnlikePostModel.getResult().equals(Constants.WN_SUCCESS)) {
+                        dashboardListArrayList.get(i).setTotalLikes(likeCount);
+                        dashboardListArrayList.get(i).setIsLiked(IsLike == 1);
+                        adapter.notifyItemChanged(i + 1, dashboardListArrayList.get(i));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+                Globals.showToast(mContext, msg);
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void displayComment(int i) {
+        navigateToComment(i);
+    }
+
+    @Override
+    public void onClickShareIcon(int i) {
+        Intent intent = new Intent(getContext(), SharePostActivity.class);
+        intent.putExtra(Constants.WN_PICTURE_PATH, dashboardListArrayList.get(i).getVideoThumbnailUrl());
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardListArrayList.get(i).getId()));
+        intent.putExtra(Constants.WN_Post_Type, ConstantEnum.PostType.NORMAL.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickOptionIcon(int i) {
+        if (globals.getUserDetails().getStatus().getCustomerId().equalsIgnoreCase(String.valueOf(dashboardListArrayList.get(i).getCustomerId()))) {
+            showEditAndDeleteDialog(i);
+        } else {
+            showTurnOnAndOffNotification(i);
+        }
+    }
+
+
+    private void showEditAndDeleteDialog(int i) {
+        CharSequence[] options = new CharSequence[]{getString(R.string.text_edit_post), getString(R.string.text_delete_post)};
+        globals.show_dialog(getContext(), "",
+                "", options, true,
+                (DialogInterface dialog, int item) -> {
+                    switch (item) {
+                        case 0:
+                            Intent intent = new Intent(getContext(), EditShareToActivity.class);
+                            intent.putExtra(Constants.WN_PICTURE_PATH, dashboardListArrayList.get(i).getVideoThumbnailUrl());
+                            intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardListArrayList.get(i).getId()));
+                            intent.putExtra(Constants.CAPTION, dashboardListArrayList.get(i).getCaption());
+                            intent.putExtra(Constants.WN_IS_IMAGE, dashboardListArrayList.get(i).getIsImage() ? 1 : 0);
+                            // intent.putExtra(Constants.WN_IS_VIDEO, dashboardListArrayList.get(i).getIsVideo());
+                            startActivity(intent);
+                            // Globals.showToast(getActivity(), getString(R.string.text_coming_soon));
+                            break;
+                        case 1:
+                            doRequestForDeletePost(i);
+                            break;
+                    }
+                });
+    }
+
+    // Delete Feed Post
+
+    private void doRequestForDeletePost(int i) {
+        String requestUrl = String.format(getString(R.string.delete_post), dashboardListArrayList.get(i).getId());
+        new PostRequest(getActivity(), null, requestUrl, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel.getResult().equalsIgnoreCase(Constants.WN_SUCCESS)) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragContent, new MyFeedFragment()).commit();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void showTurnOnAndOffNotification(int i) {
+        String option;
+        int status;
+        if (!dashboardListArrayList.get(i).getNotificationStatus()) {
+            option = getString(R.string.text_turn_on_notification);
+            status = 1;
+        } else {
+            option = getString(R.string.text_turn_off_notification);
+            status = 0;
+        }
+        CharSequence[] options = new CharSequence[]{option};
+        globals.show_dialog(getContext(), "",
+                "", options, true,
+                (dialog, item) -> doRequestToTurnOnAndOffNotification(status, dashboardListArrayList.get(i).getId()));
+    }
+
+    private void doRequestToTurnOnAndOffNotification(int status, int postId) {
+        String requestURL = String.format(getString(R.string.turn_on_and_off_notification), postId, status);
+        new PostRequest(getActivity(), null, requestURL, true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                LikeUnlikePostModel likeUnlikePostModel = new Gson().fromJson(response, LikeUnlikePostModel.class);
+                if (likeUnlikePostModel.getResult().equalsIgnoreCase(Constants.WN_SUCCESS)) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragContent, new MyFeedFragment()).commit();
+                }
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    @Override
+    public void likeDisplay(int i) {
+        Intent intent = new Intent(getContext(), LikePostActivity.class);
+        intent.putExtra(Constants.WN_POST_ID, String.valueOf(dashboardListArrayList.get(i).getId()));
+        startActivity(intent);
+    }
+
+    @Override
+    public void displayAllComments(int i) {
+        navigateToComment(i);
+    }
+
+    @Override
+    public void onClickAddComment(int i) {
+        navigateToComment(i);
+    }
+
+    @Override
+    public void onClickSmallUsername(int i) {
+        navigateToOtherUserProfile(i);
+    }
+
+    @Override
+    public void onClickSmallProfile(int i) {
+        navigateToUserProfile(i);
+    }
+
+    @Override
+    public void onFilter(boolean IsShow) {
+        //handleEmptyList();
+    }
+
+    @Override
+    public void onClickButton(int i) {
+        Uri uri = Uri.parse(getAllDashboardData.getDashboardList().get(i).getButtonLink());
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        searchPeople(s.toString().trim());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+    }
+
+    private void searchPeople(String text) {
+        if (adapter != null) {
+            adapter.getFilter().filter(text);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+}

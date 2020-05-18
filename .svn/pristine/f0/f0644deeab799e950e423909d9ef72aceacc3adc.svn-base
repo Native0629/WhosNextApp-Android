@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/banner"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="@dimen/dim_55"
+            android:layout_height="@dimen/dim_55"
+            app:srcCompat="@drawable/logo" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/dim_60"
+            android:paddingTop="@dimen/dim_40"
+            android:paddingRight="@dimen/dim_60"
+            android:paddingBottom="@dimen/dim_40">
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/et_current_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_4"
+                android:background="@drawable/border_edittext"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/current_password"
+                android:inputType="textPassword"
+                android:paddingTop="@dimen/dim_15"
+                android:paddingBottom="@dimen/dim_15"
+                android:textSize="@dimen/text_size_14" />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/et_new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_4"
+                android:background="@drawable/border_edittext"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/new_password"
+                android:inputType="textPassword"
+                android:paddingTop="@dimen/dim_15"
+                android:paddingBottom="@dimen/dim_15"
+                android:textSize="@dimen/text_size_14" />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/et_retype_new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_4"
+                android:background="@drawable/border_edittext"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center_horizontal"
+                android:hint="@string/retype_new_password"
+                android:inputType="textPassword"
+                android:paddingTop="@dimen/dim_15"
+                android:paddingBottom="@dimen/dim_15"
+                android:textSize="@dimen/text_size_14" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_4"
+                android:background="@drawable/rounded_button"
+                android:text="@string/update"
+                android:textColor="@color/white_background"
+                android:textSize="@dimen/text_size_14" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

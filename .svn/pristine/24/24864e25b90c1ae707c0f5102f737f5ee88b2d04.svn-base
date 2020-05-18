@@ -1,0 +1,228 @@
+package com.app.whosnextapp.videos.groupvideo;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.media.MediaMetadataRetriever;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.ProgressUtil;
+import com.app.whosnextapp.model.TagListModel;
+import com.app.whosnextapp.pictures.TagPeopleActivity;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.app.whosnextapp.utility.Utility;
+import com.bumptech.glide.Glide;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.vincent.videocompressor.VideoCompress;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
+public class GroupVideoActivity extends BaseAppCompatActivity implements View.OnClickListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.iv_picture_thumbnail)
+    AppCompatImageView iv_picture_thumbnail;
+    @BindView(R.id.et_video_detail)
+    AppCompatEditText et_video_detail;
+    @BindView(R.id.tv_tag_people)
+    AppCompatTextView tv_tag_people;
+
+    Globals globals;
+    String selectedVideoPath, tag_list, video_detail;
+    ArrayList<TagListModel> tagListModels = new ArrayList<>();
+    int imgHeight, imgWidth;
+    private FFmpeg ffmpeg;
+    private ACProgressFlower dialog;
+
+    private Activity getActivity() {
+        return GroupVideoActivity.this;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_group_video);
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
+        globals = (Globals) getApplicationContext();
+        setActionBar();
+        dialog = ProgressUtil.initProgressBar(getActivity());
+        ffmpeg = globals.loadFFMpegBinary(getActivity());
+        if (getIntent() != null) {
+            Bundle bundleData = getIntent().getBundleExtra(Constants.WN_EXTRA_VIDEO_TRIM_VIDEO);
+            selectedVideoPath = bundleData.getString(Constants.WN_INTENT_VIDEO_FILE);
+            onVideoReturned(new File(selectedVideoPath));
+            compressVideo(selectedVideoPath);
+        }
+    }
+
+    private void onVideoReturned(File photoFile) {
+        Glide.with(getActivity()).load(photoFile).into(iv_picture_thumbnail);
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        toolbar_title.setText(Constants.WN_VIDEOS);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    @OnClick(R.id.tv_tag_people)
+    public void onTagPeopleClick() {
+        Intent i = new Intent(getActivity(), TagPeopleActivity.class);
+        i.putExtra(Constants.WN_PICTURE_PATH, selectedVideoPath);
+        i.putExtra(Constants.WN_POST_TAG_LIST, tagListModels);
+        startActivityForResult(i, Constants.WN_UPLOAD_PICTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == Constants.WN_UPLOAD_PICTURE && data != null) {
+                tagListModels = (ArrayList<TagListModel>) data.getSerializableExtra(Constants.WN_X);
+                List<String> list = new ArrayList<>();
+                for (int i = 0; i < tagListModels.size(); i++) {
+                    list.add(tagListModels.get(i).getUsername());
+                }
+                tag_list = TextUtils.join(", ", list);
+                if (tag_list != null) {
+                    tv_tag_people.setText(tag_list);
+                } else {
+                    tv_tag_people.setText(R.string.text_tap_tag_people);
+                }
+            }
+        }
+    }
+
+    @OnClick(R.id.btn_submit)
+    public void onSubmitClick() {
+        video_detail = et_video_detail.getText().toString();
+        Intent i = new Intent(getActivity(), InvitePeopleActivity.class);
+        i.putExtra(Constants.WN_POST_TAG_LIST, tagListModels);
+        i.putExtra(Constants.WN_FILE_PATH, selectedVideoPath);
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(selectedVideoPath);
+        imgWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        imgHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        i.putExtra(Constants.WN_POST_HEIGHT, imgHeight);
+        i.putExtra(Constants.WN_POST_WIDTH, imgWidth);
+        i.putExtra(Constants.WN_DESCRIPTION, video_detail);
+        startActivity(i);
+    }
+
+    //    private void compressVideo(String path) {
+//        String dstFile = Utility.createFile(Constants.WN_VIDEO_FOLDER_PATH, Constants.WN_VIDEO_TRIM_FILE +
+//                System.currentTimeMillis(), Constants.WN_VIDEO_MP4);
+//
+//        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//        retriever.setDataSource(path);
+//        int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+//        int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+//
+//        String[] complexCommand = {"-y", "-i", path, "-s", width + "*" + height, "-r", "40", "-vcodec", "mpeg4", "-b:v",
+//                "850k", "-b:a", "48000", "-ac", "2", "-ar", "22050",
+//                (new File(dstFile)).getAbsolutePath()};
+//        execFFmpegBinary(complexCommand, dstFile);
+//    }
+//
+//    private void execFFmpegBinary(final String[] command, String dstFile) {
+//        try {
+//
+//            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+//                @Override
+//                public void onSuccess(String message) {
+//                    super.onSuccess(message);
+//                    selectedVideoPath = dstFile;
+//                }
+//
+//                @Override
+//                public void onFailure(String message) {
+//                    super.onFailure(message);
+//                }
+//
+//                @Override
+//                public void onProgress(String message) {
+//                    super.onProgress(message);
+//                }
+//
+//                @Override
+//                public void onStart() {
+//                    super.onStart();
+//                    dialog.show();
+//                }
+//
+//                @Override
+//                public void onFinish() {
+//                    super.onFinish();
+//                    dialog.dismiss();
+//                }
+//            });
+//        } catch (FFmpegCommandAlreadyRunningException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    private void compressVideo(String path) {
+        String dstFile = Utility.createFile(Constants.WN_VIDEO_FOLDER_PATH,
+                Constants.WN_VIDEO_TRIM_FILE +
+                        System.currentTimeMillis(), Constants.WN_VIDEO_MP4);
+
+        VideoCompress.compressVideoLow(path, dstFile, new VideoCompress.CompressListener() {
+            @Override
+            public void onStart() {
+
+
+            }
+
+
+            @Override
+            public void onSuccess() {
+
+                selectedVideoPath = dstFile;
+            }
+
+            @Override
+            public void onFail() {
+
+
+            }
+
+            @Override
+            public void onProgress(float percent) {
+            }
+        });
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}

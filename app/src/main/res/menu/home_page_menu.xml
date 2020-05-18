@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/header_bell"
+        android:icon="@drawable/bell"
+        android:title="Bell"
+        android:visible="false"
+        app:actionLayout="@layout/notification_tool_bar"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/header_search"
+        android:icon="@drawable/search"
+        android:title="Search"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/header_refresh"
+        android:icon="@drawable/refresh"
+        android:title="@null"
+        android:visible="false"
+        app:showAsAction="always" />
+</menu>

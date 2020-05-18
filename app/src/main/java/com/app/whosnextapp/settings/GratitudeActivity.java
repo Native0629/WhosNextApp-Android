@@ -1,0 +1,114 @@
+package com.app.whosnextapp.settings;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.app.whosnextapp.R;
+import com.app.whosnextapp.apis.HttpRequestHandler;
+import com.app.whosnextapp.apis.PostRequest;
+import com.app.whosnextapp.apis.ResponseListener;
+import com.app.whosnextapp.utility.BaseAppCompatActivity;
+import com.app.whosnextapp.utility.Constants;
+import com.app.whosnextapp.utility.Globals;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.app.whosnextapp.settings.SubscribeActivity.PAY_PAL_REQUEST_CODE;
+
+public class GratitudeActivity extends BaseAppCompatActivity implements View.OnClickListener {
+
+    private static PayPalConfiguration config = new PayPalConfiguration()
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId(Constants.PAY_PAL_CLIENT_ID);
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_title)
+    AppCompatTextView toolbar_title;
+    @BindView(R.id.et_comment)
+    AppCompatEditText et_comment;
+    @BindView(R.id.et_amount)
+    AppCompatEditText et_amount;
+    Globals globals;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_gratitude);
+        ButterKnife.bind(this);
+        init();
+    }
+
+    private void init() {
+        globals = (Globals) getApplicationContext();
+        setActionBar();
+    }
+
+    @OnClick(R.id.btn_submit)
+    public void onSubmitButtonClick() {
+        doRequestForGratitude();
+    }
+
+    @OnClick(R.id.btn_cancel)
+    public void onCancelButtonClick() {
+        et_comment.setText("");
+        et_amount.setText("");
+    }
+
+    private void setActionBar() {
+        toolbar.setBackgroundResource(R.drawable.header_bg);
+        setSupportActionBar(toolbar);
+        toolbar_title.setText(R.string.text_gratitude);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.backarrow);
+        toolbar.setNavigationOnClickListener(this);
+    }
+
+    public void doRequestForGratitude() {
+        JSONObject PostData = HttpRequestHandler.getInstance()
+                .getInsertGratitudeJson("0", et_amount.getText().toString(), et_comment.getText().toString());
+
+        new PostRequest(this, PostData, getString(R.string.insert_gratitude), true, true, new ResponseListener() {
+            @Override
+            public void onSucceedToPostCall(String response) {
+                getPayment();
+            }
+
+            @Override
+            public void onFailedToPostCall(int statusCode, String msg) {
+
+            }
+        }).execute(globals.getUserDetails().getStatus().getUserId());
+    }
+
+    private void getPayment() {
+        String paymentAmount = et_amount.getText().toString();
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(paymentAmount), getString(R.string.usd), getString(R.string.text_gratitude),
+                PayPalPayment.PAYMENT_INTENT_SALE);
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+        startActivityForResult(intent, PAY_PAL_REQUEST_CODE);
+    }
+
+    @Override
+    public void onClick(View v) {
+        onBackPressed();
+    }
+}

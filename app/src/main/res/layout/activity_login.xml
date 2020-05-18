@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <include layout="@layout/header_layout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/dim_50"
+            android:layout_marginLeft="@dimen/dim_50"
+            android:layout_marginEnd="@dimen/dim_50"
+            android:layout_marginRight="@dimen/dim_50"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:hint="@string/username"
+                android:inputType="textPersonName"
+                android:padding="@dimen/dim_15"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_16" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shaperact"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:padding="@dimen/dim_15"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/gray"
+                android:textSize="@dimen/text_size_16" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dim_5"
+                android:background="@drawable/shapebutton"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:shadowColor="@android:color/transparent"
+                android:text="@string/login"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_15" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_forgot_your_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/dim_20"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:text="@string/forgot_your_password"
+                android:textAllCaps="false"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_create_your_account"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dim_40"
+                android:layout_gravity="center"
+                android:background="@drawable/shapecreate"
+                android:fontFamily="@font/ayearwithoutrain"
+                android:gravity="center"
+                android:shadowColor="@android:color/transparent"
+                android:text="@string/create_your_account"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_18" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dim_1"
+                android:layout_margin="@dimen/dim_10"
+                android:background="@color/light_sky" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_privacy_policy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_10"
+                    android:layout_marginLeft="@dimen/dim_10"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:text="@string/privacy_policy"
+                    android:textAllCaps="false"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_18"
+                    tools:ignore="RtlHardcoded" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_terms_condition"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="@dimen/dim_10"
+                    android:layout_marginRight="@dimen/dim_10"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ayearwithoutrain"
+                    android:gravity="end"
+                    android:text="@string/terms_condition"
+                    android:textAllCaps="false"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_18"
+                    tools:ignore="RtlHardcoded" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
